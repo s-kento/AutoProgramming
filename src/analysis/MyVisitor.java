@@ -44,15 +44,16 @@ public class MyVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		setMethodName(node.getName().toString());
-		setReturnType(node.getReturnType2().toString());
-		List<SingleVariableDeclaration> pTypes = node.parameters();
-		List<String> tmp = new ArrayList<String>();
-		for (SingleVariableDeclaration pType : pTypes) {
-			tmp.add(pType.getType().toString());
+		if (!node.isConstructor()) {
+			setMethodName(node.getName().toString());
+			setReturnType(node.getReturnType2().toString());
+			List<SingleVariableDeclaration> pTypes = node.parameters();
+			List<String> tmp = new ArrayList<String>();
+			for (SingleVariableDeclaration pType : pTypes) {
+				tmp.add(pType.getType().toString());
+			}
+			setParameterType(tmp);
 		}
-		setParameterType(tmp);
-
 		return true;
 	}
 }
