@@ -17,6 +17,10 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class SourceFileAnalyzer {
 	private List<String> fileList = new ArrayList<String>();
 
+	SourceFileAnalyzer(String file){
+		setFileList(new File(file));
+	}
+
 	public void setFileList(File file) {
 		if (file.isDirectory()) {
 			File[] innerFiles = file.listFiles();
