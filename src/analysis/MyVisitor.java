@@ -103,7 +103,7 @@ public class MyVisitor extends ASTVisitor {
 			Collections.sort(tmp);//パラメータをアルファベット順にしておく
 			setParameterType(tmp);
 
-			show(this); //メソッド情報を標準出力に表示
+			showMethodInfo(this); //メソッド情報を標準出力に表示
 			try {//メソッド情報をデータベースに登録
 				db.register(this);
 			} catch (ClassNotFoundException | SQLException e) {
@@ -113,7 +113,7 @@ public class MyVisitor extends ASTVisitor {
 		return true;
 	}
 
-	public void show(MyVisitor visitor) {
+	public void showMethodInfo(MyVisitor visitor) {
 		List<String> parameterType = visitor.getParameterType();
 		System.out.println("クラス名：" + visitor.getClassName());
 		System.out.println("返値の型：" + visitor.getReturnType());
