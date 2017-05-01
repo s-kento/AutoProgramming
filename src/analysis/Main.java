@@ -9,7 +9,7 @@ public class Main {
 		for (String filePath : sfa.getFileList()) {
 			System.out.println(filePath);
 			CompilationUnit unit = sfa.getAST(filePath);
-			MyVisitor visitor = new MyVisitor(unit);
+			MyVisitor visitor = new MyVisitor(unit, filePath);
 			unit.accept(visitor);
 		}
 	}

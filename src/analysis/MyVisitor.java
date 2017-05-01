@@ -15,16 +15,26 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  */
 public class MyVisitor extends ASTVisitor {
 	private CompilationUnit unit;
+	private String filePath;
 	private String returnType;
 	private String methodName;
 	private List<String> parameterType = new ArrayList<String>();
 	private String className;
 
-	public MyVisitor(CompilationUnit unit) {// コンストラクタ
+	public MyVisitor(CompilationUnit unit, String filePath) {// コンストラクタ
 		this.unit = unit;
+		setFilePath(filePath);
 	}
 
-	/*************************getterとsetter*********************************/
+	/************************* getterとsetter *********************************/
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+
 	public String getClassName() {
 		return className;
 	}
@@ -90,7 +100,7 @@ public class MyVisitor extends ASTVisitor {
 
 	public void show(MyVisitor visitor) {
 		List<String> parameterType = visitor.getParameterType();
-		System.out.println("クラス名："+visitor.getClassName());
+		System.out.println("クラス名：" + visitor.getClassName());
 		System.out.println("返値の型：" + visitor.getReturnType());
 		System.out.println("メソッド名：" + visitor.getMethodName());
 		System.out.print("パラメータの型：");
