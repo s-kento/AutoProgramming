@@ -2,5 +2,5 @@
 /lib/
 .classpath
 .settings
-*.exe
 *.db
+*.exe
