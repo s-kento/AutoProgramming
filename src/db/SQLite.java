@@ -78,6 +78,7 @@ public class SQLite {
 		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
 		statement = connection.createStatement();
 
+		/* SQL文の作成・ここから */
 		String sql = "select * from method where 1=1";
 		if (cl.hasOption("f")) {
 			sql += " and filepath=\'" + cl.getOptionValue("f") + "\'";
@@ -103,7 +104,11 @@ public class SQLite {
 			}
 			sql += "\'";
 		}
-		ResultSet rs = statement.executeQuery(sql);
+		/* SQL文の作成・ここまで */
+
+		ResultSet rs = statement.executeQuery(sql);// SQL文の実行&結果の取得
+
+		/*結果を標準出力に表示*/
 		while (rs.next()) {
 			for (int i = 1; i <= 5; i++) {
 				System.out.print(rs.getString(i));
