@@ -110,7 +110,7 @@ public class MyVisitor extends ASTVisitor {
 		for (int i = 0; i < parameterType.size(); i++) {
 			System.out.print(parameterType.get(i));
 			if (i < parameterType.size() - 1) {
-				System.out.print(", ");
+				System.out.print(",");
 			}
 		}
 		System.out.println("\n");
