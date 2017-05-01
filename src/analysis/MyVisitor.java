@@ -95,11 +95,11 @@ public class MyVisitor extends ASTVisitor {
 		System.out.println("メソッド名：" + visitor.getMethodName());
 		System.out.print("パラメータの型：");
 		for (int i = 0; i < parameterType.size(); i++) {
-			System.out.println(parameterType.get(i));
+			System.out.print(parameterType.get(i));
 			if (i < parameterType.size() - 1) {
 				System.out.print(", ");
 			}
 		}
-		System.out.println("");
+		System.out.println("\n");
 	}
 }
