@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class SourceFileAnalyzer {
 	private List<String> fileList = new ArrayList<String>(); //ターゲットファイル群．ファイルの絶対パスを格納
 
-	SourceFileAnalyzer(String file){
+	SourceFileAnalyzer(String file){ //コンストラクタ
 		setFileList(new File(file));
 	}
 
