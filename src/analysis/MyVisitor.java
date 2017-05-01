@@ -1,5 +1,6 @@
 package analysis;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,6 +9,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+
+import db.SQLite;
 
 /*
  * メソッドのシグネチャを取得するためのvisitor
@@ -20,10 +23,12 @@ public class MyVisitor extends ASTVisitor {
 	private String methodName;
 	private List<String> parameterType = new ArrayList<String>();
 	private String className;
+	private SQLite db;
 
-	public MyVisitor(CompilationUnit unit, String filePath) {// コンストラクタ
+	public MyVisitor(CompilationUnit unit, String filePath) throws ClassNotFoundException, SQLException {// コンストラクタ
 		this.unit = unit;
 		setFilePath(filePath);
+		db = new SQLite("autoprog.db");
 	}
 
 	/************************* getterとsetter *********************************/
@@ -96,7 +101,12 @@ public class MyVisitor extends ASTVisitor {
 			}
 			setParameterType(tmp);
 
-			show(this);
+			show(this); //メソッド情報を標準出力に表示
+			try {//メソッド情報をデータベースに登録
+				db.register(this);
+			} catch (ClassNotFoundException | SQLException e) {
+				e.printStackTrace();
+			}
 		}
 		return true;
 	}

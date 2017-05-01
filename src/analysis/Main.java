@@ -1,10 +1,14 @@
 package analysis;
 
 import java.io.IOException;
+import java.sql.SQLException;
+
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+import db.SQLite;
+
 public class Main {
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException{
 		SourceFileAnalyzer sfa = new SourceFileAnalyzer(args[0]);
 		for (String filePath : sfa.getFileList()) {
 			System.out.println(filePath);
