@@ -88,6 +88,9 @@ public class MyVisitor extends ASTVisitor {
 			setReturnType(node.getReturnType2().toString());
 			List<SingleVariableDeclaration> pTypes = node.parameters();
 			List<String> tmp = new ArrayList<String>();
+			if(pTypes.size()==0){//引数がない場合，nullと格納．
+				tmp.add("null");
+			}
 			for (SingleVariableDeclaration pType : pTypes) {
 				tmp.add(pType.getType().toString());
 			}
