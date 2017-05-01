@@ -2,6 +2,7 @@ package analysis;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -99,6 +100,7 @@ public class MyVisitor extends ASTVisitor {
 			for (SingleVariableDeclaration pType : pTypes) {
 				tmp.add(pType.getType().toString());
 			}
+			Collections.sort(tmp);//パラメータをアルファベット順にしておく
 			setParameterType(tmp);
 
 			show(this); //メソッド情報を標準出力に表示
