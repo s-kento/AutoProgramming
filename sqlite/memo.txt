@@ -1,0 +1,5 @@
+データべース名
+autoprog.db
+
+接続文字列
+jdbc:sqlite:C:\pleiades\workspace\AutoProgramming\sqlite\autoprog.db

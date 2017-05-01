@@ -1,5 +1,5 @@
 /bin/
 /lib/
-/sqlite/
 .classpath
 .settings
+*.exe
