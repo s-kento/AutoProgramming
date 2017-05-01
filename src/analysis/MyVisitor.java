@@ -8,6 +8,10 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
+/*
+ * メソッドのシグネチャを取得するためのvisitor
+ * @author s-kento
+ */
 public class MyVisitor extends ASTVisitor {
 	private CompilationUnit unit;
 	private String returnType;
@@ -44,7 +48,7 @@ public class MyVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (!node.isConstructor()) {
+		if (!node.isConstructor()) { //コンストラクタは無視する
 			setMethodName(node.getName().toString());
 			setReturnType(node.getReturnType2().toString());
 			List<SingleVariableDeclaration> pTypes = node.parameters();

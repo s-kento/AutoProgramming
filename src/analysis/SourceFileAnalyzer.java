@@ -14,13 +14,22 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+/*
+ * ソースファイルの解析をするクラス
+ * @author s-kento
+ */
+
 public class SourceFileAnalyzer {
-	private List<String> fileList = new ArrayList<String>();
+	private List<String> fileList = new ArrayList<String>(); //ターゲットファイル群．ファイルの絶対パスを格納
 
 	SourceFileAnalyzer(String file){
 		setFileList(new File(file));
 	}
 
+	/*
+	 * 指定したディレクトリ下のファイル名(絶対パス)をfileList変数に格納する
+	 * @param file ターゲットディレクトリ
+	 */
 	public void setFileList(File file) {
 		if (file.isDirectory()) {
 			File[] innerFiles = file.listFiles();
@@ -34,10 +43,19 @@ public class SourceFileAnalyzer {
 		}
 	}
 
+	/*
+	 * fileListを返す
+	 * @return fileList
+	 */
 	public List<String> getFileList() {
 		return fileList;
 	}
 
+	/*
+	 * ソースコードのASTを返す
+	 * @param filePath ファイルの絶対パス
+	 * @return CompolationUnit ソースコードのAST
+	 */
 	public CompilationUnit getAST(String filePath) throws IOException {
 		String source = Files.lines(Paths.get(filePath), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
