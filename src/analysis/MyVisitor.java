@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 /*
  * メソッドのシグネチャを取得するためのvisitor
@@ -17,6 +18,20 @@ public class MyVisitor extends ASTVisitor {
 	private String returnType;
 	private String methodName;
 	private List<String> parameterType = new ArrayList<String>();
+	private String className;
+
+	public MyVisitor(CompilationUnit unit) {// コンストラクタ
+		this.unit = unit;
+	}
+
+	/*************************getterとsetter*********************************/
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
 
 	public String getReturnType() {
 		return returnType;
@@ -42,13 +57,23 @@ public class MyVisitor extends ASTVisitor {
 		this.parameterType = parameterType;
 	}
 
-	public MyVisitor(CompilationUnit unit) {
-		this.unit = unit;
+	/******************************************************************/
+
+	/*
+	 * クラス名を取得
+	 */
+	@Override
+	public boolean visit(TypeDeclaration node) {
+		setClassName(node.getName().toString());
+		return true;
 	}
 
+	/*
+	 * メソッドのシグネチャ情報を取得
+	 */
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (!node.isConstructor()) { //コンストラクタは無視する
+		if (!node.isConstructor()) { // コンストラクタは無視する
 			setMethodName(node.getName().toString());
 			setReturnType(node.getReturnType2().toString());
 			List<SingleVariableDeclaration> pTypes = node.parameters();
@@ -57,7 +82,24 @@ public class MyVisitor extends ASTVisitor {
 				tmp.add(pType.getType().toString());
 			}
 			setParameterType(tmp);
+
+			show(this);
 		}
 		return true;
+	}
+
+	public void show(MyVisitor visitor) {
+		List<String> parameterType = visitor.getParameterType();
+		System.out.println("クラス名："+visitor.getClassName());
+		System.out.println("返値の型：" + visitor.getReturnType());
+		System.out.println("メソッド名：" + visitor.getMethodName());
+		System.out.print("パラメータの型：");
+		for (int i = 0; i < parameterType.size(); i++) {
+			System.out.println(parameterType.get(i));
+			if (i < parameterType.size() - 1) {
+				System.out.print(", ");
+			}
+		}
+		System.out.println("");
 	}
 }
