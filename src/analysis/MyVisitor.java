@@ -113,6 +113,10 @@ public class MyVisitor extends ASTVisitor {
 		return true;
 	}
 
+	/*
+	 * メソッド情報を標準出力に表示する
+	 * @param visitor
+	 */
 	public void showMethodInfo(MyVisitor visitor) {
 		List<String> parameterType = visitor.getParameterType();
 		System.out.println("クラス名：" + visitor.getClassName());
