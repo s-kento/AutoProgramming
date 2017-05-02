@@ -20,14 +20,15 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
  */
 
 public class SourceFileAnalyzer {
-	private List<String> fileList = new ArrayList<String>(); //ターゲットファイル群．ファイルの絶対パスを格納
+	private List<String> fileList = new ArrayList<String>(); // ターゲットファイル群．ファイルの絶対パスを格納
 
-	SourceFileAnalyzer(String file){ //コンストラクタ
+	SourceFileAnalyzer(String file) { // コンストラクタ
 		setFileList(new File(file));
 	}
 
 	/*
 	 * 指定したディレクトリ下のファイル名(絶対パス)をfileList変数に格納する
+	 *
 	 * @param file ターゲットディレクトリ
 	 */
 	public void setFileList(File file) {
@@ -45,6 +46,7 @@ public class SourceFileAnalyzer {
 
 	/*
 	 * fileListを返す
+	 *
 	 * @return fileList
 	 */
 	public List<String> getFileList() {
@@ -53,7 +55,9 @@ public class SourceFileAnalyzer {
 
 	/*
 	 * ソースコードのASTを返す
+	 *
 	 * @param filePath ファイルの絶対パス
+	 *
 	 * @return CompolationUnit ソースコードのAST
 	 */
 	public CompilationUnit getAST(String filePath) throws IOException {

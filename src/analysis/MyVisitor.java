@@ -26,10 +26,11 @@ public class MyVisitor extends ASTVisitor {
 	private String className;
 	private SQLite db;
 
-	public MyVisitor(CompilationUnit unit, String filePath) throws ClassNotFoundException, SQLException {// コンストラクタ
+	public MyVisitor(CompilationUnit unit, String filePath, String db, String table)
+			throws ClassNotFoundException, SQLException {// コンストラクタ
 		this.unit = unit;
 		setFilePath(filePath);
-		db = new SQLite("autoprog.db");
+		this.db = new SQLite(db, table);
 	}
 
 	/************************* getterとsetter *********************************/
@@ -89,22 +90,22 @@ public class MyVisitor extends ASTVisitor {
 	 */
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (!node.isConstructor()) { // コンストラクタは無視する
+		if (!node.isConstructor() && node.getReturnType2()!=null) { // コンストラクタ，ENUM宣言は無視する．
 			setMethodName(node.getName().toString());
 			setReturnType(node.getReturnType2().toString());
 			List<SingleVariableDeclaration> pTypes = node.parameters();
 			List<String> tmp = new ArrayList<String>();
-			if(pTypes.size()==0){//引数がない場合，nullと格納．
+			if (pTypes.size() == 0) {// 引数がない場合，nullと格納．
 				tmp.add("null");
 			}
 			for (SingleVariableDeclaration pType : pTypes) {
 				tmp.add(pType.getType().toString());
 			}
-			Collections.sort(tmp);//パラメータをアルファベット順にしておく
+			Collections.sort(tmp);// パラメータをアルファベット順にしておく
 			setParameterType(tmp);
 
-			showMethodInfo(this); //メソッド情報を標準出力に表示
-			try {//メソッド情報をデータベースに登録
+			showMethodInfo(this); // メソッド情報を標準出力に表示
+			try {// メソッド情報をデータベースに登録
 				db.register(this);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
@@ -115,6 +116,7 @@ public class MyVisitor extends ASTVisitor {
 
 	/*
 	 * メソッド情報を標準出力に表示する
+	 *
 	 * @param visitor
 	 */
 	public void showMethodInfo(MyVisitor visitor) {

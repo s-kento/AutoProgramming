@@ -3,3 +3,6 @@ autoprog.db
 
 接続文字列
 jdbc:sqlite:C:\pleiades\workspace\AutoProgramming\sqlite\autoprog.db
+
+テーブル内容全削除
+delete from [テーブル名];

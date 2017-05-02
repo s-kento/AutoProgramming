@@ -21,9 +21,11 @@ public class SQLite {
 	Connection connection = null;
 	Statement statement = null;
 	String db;
+	String table;
 
-	public SQLite(String db) throws ClassNotFoundException, SQLException {// コンストラクタ
+	public SQLite(String db, String table) throws ClassNotFoundException, SQLException {// コンストラクタ
 		this.db = db;
+		this.table = table;
 	}
 
 	/*
@@ -38,8 +40,8 @@ public class SQLite {
 		List<String> parameterType = visitor.getParameterType();
 
 		/* SQL文の作成・ここから */
-		String sql = "insert into method values(\'" + visitor.getFilePath() + "\',\'" + visitor.getClassName() + "\',\'"
-				+ visitor.getMethodName() + "\',\'" + visitor.getReturnType() + "\',\'";
+		String sql = "insert into " + table + " values(\'" + visitor.getFilePath() + "\',\'" + visitor.getClassName()
+				+ "\',\'" + visitor.getMethodName() + "\',\'" + visitor.getReturnType() + "\',\'";
 		String params = "";
 		for (int i = 0; i < parameterType.size(); i++) {
 			params += parameterType.get(i);
@@ -79,7 +81,7 @@ public class SQLite {
 		statement = connection.createStatement();
 
 		/* SQL文の作成・ここから */
-		String sql = "select * from method where 1=1";
+		String sql = "select * from " + table + " where 1=1";
 		if (cl.hasOption("f")) {
 			sql += " and filepath=\'" + cl.getOptionValue("f") + "\'";
 		}
@@ -108,7 +110,7 @@ public class SQLite {
 
 		ResultSet rs = statement.executeQuery(sql);// SQL文の実行&結果の取得
 
-		/*結果を標準出力に表示*/
+		/* 結果を標準出力に表示 */
 		while (rs.next()) {
 			for (int i = 1; i <= 5; i++) {
 				System.out.print(rs.getString(i));
