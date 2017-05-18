@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -91,6 +92,9 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (!node.isConstructor() && node.getReturnType2()!=null) { // コンストラクタ，ENUM宣言は無視する．
+			ITypeBinding itb =node.getReturnType2().resolveBinding();
+			System.out.println(itb.getPackage());
+			System.out.println(itb.getName());
 			setMethodName(node.getName().toString());
 			setReturnType(node.getReturnType2().toString());
 			List<SingleVariableDeclaration> pTypes = node.parameters();

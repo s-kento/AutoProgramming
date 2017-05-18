@@ -7,9 +7,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -63,9 +65,22 @@ public class SourceFileAnalyzer {
 	public CompilationUnit getAST(String filePath) throws IOException {
 		String source = Files.lines(Paths.get(filePath), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
+		ASTParser parser = ASTParser.newParser(AST.JLS8);
+		parser.setBindingsRecovery(true);
+		parser.setStatementsRecovery(true);
+		parser.setResolveBindings(true);
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		Map options = JavaCore.getOptions();
+		parser.setCompilerOptions(options);
+		parser.setEnvironment(Envs.getClassPath(), Envs.getSourcePath(), null, true);
+		parser.setSource(source.toCharArray());
+		parser.setUnitName("Target.java");
+		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+		/*String source = Files.lines(Paths.get(filePath), Charset.forName("UTF-8"))
+				.collect(Collectors.joining(System.getProperty("line.separator")));
 		ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(source.toCharArray());
-		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());*/
 		return unit;
 	}
 }
