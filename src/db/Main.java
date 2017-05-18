@@ -5,6 +5,10 @@ import java.sql.SQLException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 
+/*
+ * データベースを参照するクラス
+ */
+
 public class Main {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, ParseException {
 		Config conf = new Config();

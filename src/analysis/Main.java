@@ -10,6 +10,10 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import db.Config;
 import db.SQLite;
 
+/*
+ * データベースに格納するクラス
+ */
+
 public class Main {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
 		Config conf = new Config();
