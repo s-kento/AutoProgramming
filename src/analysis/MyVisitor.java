@@ -27,6 +27,8 @@ public class MyVisitor extends ASTVisitor {
 	private String methodName;
 	private List<String> parameterType = new ArrayList<String>();
 	private String className;
+	private String sourcecode;
+
 	private SQLite db;
 
 	public MyVisitor(CompilationUnit unit, String filePath, String db, String table)
@@ -77,6 +79,14 @@ public class MyVisitor extends ASTVisitor {
 		this.parameterType = parameterType;
 	}
 
+	public String getSourcecode() {
+		return sourcecode;
+	}
+
+	public void setSourcecode(String sourcecode) {
+		this.sourcecode = sourcecode;
+	}
+
 	/******************************************************************/
 
 	/*
@@ -96,6 +106,7 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (!node.isConstructor() && node.getReturnType2() != null) { // コンストラクタ，ENUM宣言は無視する．
+			setSourcecode(node.toString());
 			setMethodName(node.getName().toString());
 			setReturnType(getFQName(node.getReturnType2()));
 			List<SingleVariableDeclaration> pTypes = node.parameters();
@@ -166,7 +177,8 @@ public class MyVisitor extends ASTVisitor {
 	 */
 	public String getFQName(Type node) {
 		ITypeBinding itb = node.resolveBinding();
-		String packageName=null;;
+		String packageName = null;
+		;
 		if (itb.getPackage() != null)
 			packageName = itb.getPackage().getName().toString();
 		String fqName = node.toString();
