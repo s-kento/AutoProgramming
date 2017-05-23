@@ -5,11 +5,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import db.SQLite;
@@ -82,7 +84,9 @@ public class MyVisitor extends ASTVisitor {
 	 */
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		setClassName(node.getName().toString());
+		if (node.isInterface()) // インターフェースは無視
+			return false;
+		setClassName(getFQName(node));
 		return true;
 	}
 
@@ -91,19 +95,16 @@ public class MyVisitor extends ASTVisitor {
 	 */
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (!node.isConstructor() && node.getReturnType2()!=null) { // コンストラクタ，ENUM宣言は無視する．
-			ITypeBinding itb =node.getReturnType2().resolveBinding();
-			System.out.println(itb.getPackage());
-			System.out.println(itb.getName());
+		if (!node.isConstructor() && node.getReturnType2() != null) { // コンストラクタ，ENUM宣言は無視する．
 			setMethodName(node.getName().toString());
-			setReturnType(node.getReturnType2().toString());
+			setReturnType(getFQName(node.getReturnType2()));
 			List<SingleVariableDeclaration> pTypes = node.parameters();
 			List<String> tmp = new ArrayList<String>();
 			if (pTypes.size() == 0) {// 引数がない場合，nullと格納．
 				tmp.add("null");
 			}
 			for (SingleVariableDeclaration pType : pTypes) {
-				tmp.add(pType.getType().toString());
+				tmp.add(getFQName(pType.getType()));
 			}
 			Collections.sort(tmp);// パラメータをアルファベット順にしておく
 			setParameterType(tmp);
@@ -136,5 +137,43 @@ public class MyVisitor extends ASTVisitor {
 			}
 		}
 		System.out.println("\n");
+	}
+
+	/*
+	 * 完全限定名を取得
+	 *
+	 * @param ASTNode node
+	 *
+	 * @retun String
+	 */
+	public String getFQName(TypeDeclaration node) {
+		ITypeBinding itb = node.resolveBinding();
+		String packageName = itb.getPackage().getName().toString();
+		String fqName = node.getName().toString();
+		if (packageName != null) {
+			fqName = packageName + "." + fqName;
+		}
+
+		return fqName;
+	}
+
+	/*
+	 * 完全限定名を取得
+	 *
+	 * @param ASTNode node
+	 *
+	 * @retun String
+	 */
+	public String getFQName(Type node) {
+		ITypeBinding itb = node.resolveBinding();
+		String packageName=null;;
+		if (itb.getPackage() != null)
+			packageName = itb.getPackage().getName().toString();
+		String fqName = node.toString();
+		if (packageName != null) {
+			fqName = packageName + "." + fqName;
+		}
+
+		return fqName;
 	}
 }
