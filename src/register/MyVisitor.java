@@ -27,14 +27,15 @@ public class MyVisitor extends ASTVisitor {
 	private String methodName;
 	private List<String> parameterType = new ArrayList<String>();
 	private String className;
-	private String sourcecode;
+	private String projectName;
 
 	private SQLite db;
 
-	public MyVisitor(CompilationUnit unit, String filePath, String db, String table)
+	public MyVisitor(CompilationUnit unit, String filePath, String db, String table, String projectName)
 			throws ClassNotFoundException, SQLException {// コンストラクタ
 		this.unit = unit;
 		setFilePath(filePath);
+		setProjectName(projectName);
 		this.db = new SQLite(db, table);
 	}
 
@@ -79,14 +80,14 @@ public class MyVisitor extends ASTVisitor {
 		this.parameterType = parameterType;
 	}
 
-	public String getSourcecode() {
-		return sourcecode;
+
+	public String getProjectName() {
+		return projectName;
 	}
 
-	public void setSourcecode(String sourcecode) {
-		this.sourcecode = sourcecode;
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
 	}
-
 	/******************************************************************/
 
 	/*
@@ -106,7 +107,6 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (!node.isConstructor() && node.getReturnType2() != null) { // コンストラクタ，ENUM宣言は無視する．
-			setSourcecode(node.toString());
 			setMethodName(node.getName().toString());
 			setReturnType(getFQName(node.getReturnType2()));
 			List<SingleVariableDeclaration> pTypes = node.parameters();

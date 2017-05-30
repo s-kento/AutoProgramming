@@ -12,6 +12,7 @@ public class Config {
 		options.addOption("f", "filepath", true, "ファイルパス");
 		options.addOption("d", "database", true, "データベース名");
 		options.addOption("t", "table", true, "テーブル名");
+		options.addOption("p","project",true,"プロジェクト名");
 
 		CommandLineParser parser = new BasicParser();
 		CommandLine commandLine;

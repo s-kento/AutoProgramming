@@ -23,7 +23,8 @@ public class Main {
 		for (String filePath : sfa.getFileList()) {
 			System.out.println(filePath);
 			CompilationUnit unit = sfa.getAST(filePath);
-			MyVisitor visitor = new MyVisitor(unit, filePath, cl.getOptionValue("d"), cl.getOptionValue("t"));
+			MyVisitor visitor = new MyVisitor(unit, filePath, cl.getOptionValue("d"), cl.getOptionValue("t"),
+					cl.getOptionValue("p"));
 			unit.accept(visitor);
 		}
 	}
