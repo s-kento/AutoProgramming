@@ -49,7 +49,7 @@ public class SQLite {
 				params += ",";
 			}
 		}
-		sql += params + "\',\'"+visitor.getSourcecode()+"\')";
+		sql += params +"\',\'"+visitor.getProjectName()+"\')";
 		/* SQL文の作成・ここまで */
 
 		statement.executeUpdate(sql);// SQL文の実行
