@@ -1,5 +1,6 @@
 /bin/
 /lib/
+/test/
 .classpath
 .settings
 *.db
