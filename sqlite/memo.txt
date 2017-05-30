@@ -10,6 +10,12 @@ SQLite入門：https://www.dbonline.jp/
 インデックスの作成
 	create index インデックス名 on テーブル名(カラム名1，カラム名2，・・・);
 
+カラムの追加
+	alter table テーブル名 add column カラム名 [データ型];
+
+テーブルの削除
+	drop table テーブル名
+
 データべース名
 autoprog.db
 
