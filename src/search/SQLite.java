@@ -1,4 +1,4 @@
-package db;
+package search;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 
-import analysis.MyVisitor;
+import register.MyVisitor;
 
 /*
  * DBに接続するクラス

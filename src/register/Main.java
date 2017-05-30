@@ -1,4 +1,4 @@
-package analysis;
+package register;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -7,8 +7,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import db.Config;
-import db.SQLite;
+import search.Config;
+import search.SQLite;
 
 /*
  * データベースに格納するクラス

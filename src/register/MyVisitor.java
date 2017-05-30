@@ -1,4 +1,4 @@
-package analysis;
+package register;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import db.SQLite;
+import search.SQLite;
 
 /*
  * メソッドのシグネチャを取得するためのvisitor

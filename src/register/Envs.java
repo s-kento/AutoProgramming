@@ -1,4 +1,4 @@
-package analysis;
+package register;
 
 import java.io.File;
 

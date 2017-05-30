@@ -1,4 +1,4 @@
-package db;
+package search;
 
 import java.sql.SQLException;
 
