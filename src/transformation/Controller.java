@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Enumeration;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -47,7 +48,14 @@ public class Controller {
 	private void printFile(ZipFile zipFile, String name) throws IOException {
 		File file = new File("work\\" + name);
 		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-		ZipEntry ze = zipFile.getEntry(name);
+		ZipEntry ze=null;
+		Enumeration<? extends ZipEntry> entries = zipFile.entries();
+		while (entries.hasMoreElements()) {
+		     ze = entries.nextElement();
+		    if (new File(ze.getName()).getName().equals(name)) {
+		        break;
+		    }
+		}
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)))) {
 			for (;;) {
 				String text = reader.readLine();
