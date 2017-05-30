@@ -93,11 +93,12 @@ public class Controller {
 	 * @param packageName パッケージ名
 	 * @param className クラス名
 	 * @param methodName メソッド名
+	 * @param parameterName 引数の型
 	 * @param args メソッドの引数
 	 * @return r メソッドの戻り値
 	 */
 	public Object run(String jarFileName, String javaFileName, String packageName, String className, String methodName,
-			Object[] args) {
+			String parameterName, Object[] args) {
 		File file1 = new File("C:\\pleiades\\workspace\\AutoProgramming\\work\\");
 		File file2 = new File("C:\\pleiades\\workspace\\AutoProgramming\\work\\" + jarFileName);
 		URLClassLoader load;
@@ -106,7 +107,7 @@ public class Controller {
 			load = URLClassLoader.newInstance(new URL[] { file1.toURI().toURL(), file2.toURI().toURL() });
 			Class cl;
 			cl = load.loadClass(packageName + "." + className);
-			Method method = cl.getMethod(methodName, new Class[]{Object[].class});
+			Method method = cl.getMethod(methodName,analyzeType(parameterName));
 			r = method.invoke(cl.newInstance(), args);
 		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException | InstantiationException
@@ -114,5 +115,23 @@ public class Controller {
 			e.printStackTrace();
 		}
 		return r;
+	}
+
+	/*
+	 * カンマ区切りの型名から，Classクラスの配列を返す
+	 * @param parameterTypes 引数の型，カンマ区切り
+	 * @return classes Classクラスの配列
+	 */
+	public Class<?>[] analyzeType(String parameterTypes){
+		String[] types=parameterTypes.split(",",0);
+		Class<?>[] classes = new Class<?>[types.length];
+		for(int i=0;i<types.length;i++){
+			try {
+				classes[i]=Class.forName(types[i]);
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		return classes;
 	}
 }
