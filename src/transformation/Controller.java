@@ -62,7 +62,7 @@ public class Controller {
 				if (text == null) {
 					break;
 				}
-				System.out.println(text);
+				//System.out.println(text);
 				pw.println(text);
 			}
 		}
@@ -123,6 +123,8 @@ public class Controller {
 	 * @return classes Classクラスの配列
 	 */
 	public Class<?>[] analyzeType(String parameterTypes){
+		if(parameterTypes.equals("null"))
+			return null;
 		String[] types=parameterTypes.split(",",0);
 		Class<?>[] classes = new Class<?>[types.length];
 		for(int i=0;i<types.length;i++){
@@ -134,4 +136,19 @@ public class Controller {
 		}
 		return classes;
 	}
+
+	/*
+	 * ファイル名に.jarがついてなければつける
+	 * @param original jarファイル名
+	 * @return adjusted 拡張子付きのファイル名
+	 */
+	/*public String adjustJarFileName(String original){
+		String adjusted;
+		if(new File(original).getPath().endsWith(".jar")){
+			adjusted=original;
+		}else{
+			adjusted=original+".jar";
+		}
+		return adjusted;
+	}*/
 }
