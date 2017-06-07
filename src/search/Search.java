@@ -10,8 +10,8 @@ import org.apache.commons.cli.ParseException;
  * データベースを参照するクラス
  */
 
-public class Main {
-	public static void main(String[] args) throws ClassNotFoundException, SQLException, ParseException {
+public class Search {
+	public void execute(String[] args) throws ClassNotFoundException, SQLException, ParseException {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);
 		SQLite db = new SQLite(cl.getOptionValue("d"), cl.getOptionValue("t"));
@@ -19,7 +19,7 @@ public class Main {
 		Ranker rank = new Ranker();
 		methods = rank.sortByMethodNameSimilarity("swap", methods);
 		for(MethodInfo method:methods){
-			System.out.println(method.getMethodName());
+			System.out.println(method.getFilePath()+", "+method.getMethodName());
 		}
 	}
 }

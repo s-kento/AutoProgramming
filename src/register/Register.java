@@ -14,8 +14,8 @@ import search.SQLite;
  * データベースに格納するクラス
  */
 
-public class Main {
-	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
+public class Register {
+	public void execute(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);
 		SourceFileAnalyzer sfa = new SourceFileAnalyzer(cl.getOptionValue("f"));
