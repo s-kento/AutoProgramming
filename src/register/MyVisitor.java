@@ -18,6 +18,7 @@ import search.SQLite;
 
 /*
  * メソッドのシグネチャを取得するためのvisitor
+ * メソッド情報も持つ
  * @author s-kento
  */
 public class MyVisitor extends ASTVisitor {
