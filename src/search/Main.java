@@ -1,6 +1,7 @@
 package search;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
@@ -14,6 +15,11 @@ public class Main {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);
 		SQLite db = new SQLite(cl.getOptionValue("d"), cl.getOptionValue("t"));
-		db.showTable(cl);
+		List<MethodInfo> methods = db.getMethodInfo(cl);
+		Ranker rank = new Ranker();
+		methods = rank.sortByMethodNameSimilarity("swap", methods);
+		for(MethodInfo method:methods){
+			System.out.println(method.getMethodName());
+		}
 	}
 }
