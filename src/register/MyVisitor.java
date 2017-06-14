@@ -1,11 +1,12 @@
 package register;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTNode;
+import org.apache.commons.codec.binary.Hex;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -29,6 +30,8 @@ public class MyVisitor extends ASTVisitor {
 	private List<String> parameterType = new ArrayList<String>();
 	private String className;
 	private String projectName;
+	private int startLine;
+	private String sourceCode;
 
 	private SQLite db;
 
@@ -81,7 +84,6 @@ public class MyVisitor extends ASTVisitor {
 		this.parameterType = parameterType;
 	}
 
-
 	public String getProjectName() {
 		return projectName;
 	}
@@ -89,6 +91,23 @@ public class MyVisitor extends ASTVisitor {
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
 	}
+
+	public int getStartLine() {
+		return startLine;
+	}
+
+	public void setStartLine(int startLine) {
+		this.startLine = startLine;
+	}
+
+	public String getSourceCode() {
+		return sourceCode;
+	}
+
+	public void setSourceCode(String sourceCode) {
+		this.sourceCode = sourceCode;
+	}
+
 	/******************************************************************/
 
 	/*
@@ -108,6 +127,8 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (!node.isConstructor() && node.getReturnType2() != null) { // コンストラクタ，ENUM宣言は無視する．
+			setStartLine(unit.getLineNumber(node.getStartPosition() - 1));
+			setSourceCode(toHexString(node.toString()));
 			setMethodName(node.getName().toString());
 			setReturnType(getFQName(node.getReturnType2()));
 			List<SingleVariableDeclaration> pTypes = node.parameters();
@@ -188,5 +209,24 @@ public class MyVisitor extends ASTVisitor {
 		}
 
 		return fqName;
+	}
+
+	/*
+	 * String型の文字列を16進数文字列に変換
+	 *
+	 * @param str String型の文字列
+	 *
+	 * @return hexstr 16進数文字列
+	 */
+	public String toHexString(String str) {
+		byte[] bytes = null;
+		try {
+			bytes = str.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		String hexstr = new String(Hex.encodeHex(bytes));
+
+		return hexstr;
 	}
 }

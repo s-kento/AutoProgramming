@@ -1,7 +1,7 @@
 package search;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 
 /*
  * メソッド情報を持つクラス
@@ -13,15 +13,20 @@ public class MethodInfo {
 	private String parameterType;
 	private String className;
 	private String projectName;
+	private int startLine;
+	private String sourceCode;
+
 
 	MethodInfo(String filePath, String className, String methodName, String returnType, String parameterType,
-			String projectName) {
+			String projectName, int startLine, String sourceCode) throws DecoderException {
 		setFilePath(filePath);
 		setClassName(className);
 		setMethodName(methodName);
 		setReturnType(returnType);
 		setParameterType(parameterType);
 		setProjectName(projectName);
+		setStartLine(startLine);
+		setSourceCode(sourceCode);
 	}
 
 	public String getFilePath() {
@@ -70,5 +75,27 @@ public class MethodInfo {
 
 	public void setProjectName(String projectName) {
 		this.projectName = projectName;
+	}
+
+	public int getStartLine() {
+		return startLine;
+	}
+
+	public void setStartLine(int startLine) {
+		this.startLine = startLine;
+	}
+
+	public String getSourceCode() {
+		return sourceCode;
+	}
+
+	public void setSourceCode(String sourceCode) throws DecoderException {
+		this.sourceCode = toString(sourceCode);
+	}
+
+	public String toString(String hexstr) throws DecoderException{
+		byte[] sbyte = Hex.decodeHex(hexstr.toCharArray());
+		String str = new String(sbyte);
+		return str;
 	}
 }

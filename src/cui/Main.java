@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.codec.DecoderException;
 
 import register.Register;
 import search.Search;
@@ -14,7 +15,8 @@ import transformation.Transformation;
  * CUI操作を担当するクラス
  */
 public class Main {
-	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
+	public static void main(String[] args)
+			throws ClassNotFoundException, SQLException, IOException, ParseException, DecoderException {
 		while(true){
 			System.out.print(">");
 			Scanner scan = new Scanner(System.in);

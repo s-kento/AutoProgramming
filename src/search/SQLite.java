@@ -1,5 +1,6 @@
 package search;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.codec.DecoderException;
 
 import register.MyVisitor;
 
@@ -21,12 +23,14 @@ public class SQLite {
 
 	Connection connection = null;
 	Statement statement = null;
-	String db;
-	String table;
+	String db = "autoprog.db";
+	String table = "methods";
 
 	public SQLite(String db, String table) throws ClassNotFoundException, SQLException {// コンストラクタ
-		this.db = db;
-		this.table = table;
+		if (db != null)
+			this.db = db;
+		if (table != null)
+			this.table = table;
 	}
 
 	/*
@@ -50,7 +54,8 @@ public class SQLite {
 				params += ",";
 			}
 		}
-		sql += params + "\',\'" + visitor.getProjectName() + "\')";
+		sql += params + "\',\'" + visitor.getProjectName() + "\',\'" + visitor.getStartLine() + "\',\'"
+				+ visitor.getSourceCode() + "\')";
 		/* SQL文の作成・ここまで */
 
 		statement.executeUpdate(sql);// SQL文の実行
@@ -75,9 +80,11 @@ public class SQLite {
 	 * クエリを満たすメソッド一覧を，MethodInfoクラスのリストとして返す
 	 *
 	 * @param cli クエリ
+	 *
 	 * @return methods MethodInfoクラスのリスト
 	 */
-	public List<MethodInfo> getMethodInfo(CommandLine cl) throws ClassNotFoundException, SQLException {
+	public List<MethodInfo> getMethodInfo(CommandLine cl)
+			throws ClassNotFoundException, SQLException, IOException, DecoderException {
 		Class.forName("org.sqlite.JDBC");
 		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
 		statement = connection.createStatement();
@@ -116,7 +123,7 @@ public class SQLite {
 		List<MethodInfo> methods = new ArrayList<MethodInfo>();
 		while (rs.next()) {
 			MethodInfo method = new MethodInfo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
-					rs.getString(5), rs.getString(6));
+					rs.getString(5), rs.getString(6), rs.getInt(7), rs.getString(8));
 			methods.add(method);
 		}
 

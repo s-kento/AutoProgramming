@@ -8,7 +8,6 @@ import org.apache.commons.cli.ParseException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import search.Config;
-import search.SQLite;
 
 /*
  * データベースに格納するクラス
