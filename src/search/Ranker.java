@@ -14,6 +14,14 @@ import org.apache.lucene.search.spell.LevensteinDistance;
  * メソッドのランク付けを行うクラス
  */
 public class Ranker {
+
+	/*
+	 * メソッド名の類似度によるソートを行う
+	 * @param methodName メソッド名
+	 * @param methods MethodInfoのリスト
+	 *
+	 * @return ソート済みのMethodInfoリスト
+	 */
 	public List<MethodInfo> sortByMethodNameSimilarity(String methodName, List<MethodInfo> methods){
 		List<MethodInfo> sortedMethods = new ArrayList<MethodInfo>();
 		Map<MethodInfo, Float> distance = new HashMap<MethodInfo, Float>();
@@ -35,6 +43,11 @@ public class Ranker {
 		return sortedMethods;
 	}
 
+	/*
+	 * レーベンシュタイン距離を計算する
+	 * @param str1,str2 距離を計算する文字列
+	 * @return ld.getDistance 距離
+	 */
 	public float calcLeven(String str1, String str2){
 		LevensteinDistance ld = new LevensteinDistance();
 		return ld.getDistance(str1, str2);
