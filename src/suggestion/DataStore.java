@@ -24,14 +24,15 @@ class DataStore {
             } else if (nowMethod.getSourceCode().length() > method.getSourceCode().length()) {
                 nowMethod = method;
             }
+            id += 1;
         }
         if (nowMethod == null) return;
         checkMethod(nowMethod);
     }
 
     void next(Method nextMethod) {
-        checkMethod(nowMethod);
         nowMethod = nextMethod;
+        checkMethod(nowMethod);
     }
 
     private void checkMethod(Method method) {

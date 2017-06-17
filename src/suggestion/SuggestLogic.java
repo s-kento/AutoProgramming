@@ -29,11 +29,13 @@ class SuggestLogic {
             for (Method m: store.getCheckedMethods()) {
                 length += getCache(method, m);
             }
+            System.out.println(method.getId() + " length: " + length);
             if (maxLength < length) {
                 nextMethod = method;
+                maxLength = length;
             }
         }
-        if (nextMethod == null) return;
+        System.out.println("next: " + nextMethod.getId() + "\n");
         store.next(nextMethod);
     }
 
@@ -46,6 +48,7 @@ class SuggestLogic {
             JsonObject object = parser.parse(text).getAsJsonObject();
             JsonArray array = object.getAsJsonArray("actions");
             int length = array.size();
+            System.out.println("(" + sourceMethod.getId() + ", " + method.getId() + "): " + length);
             setCache(method, sourceMethod, length);
         }
     }
@@ -53,7 +56,7 @@ class SuggestLogic {
     private String executeGumtree(Method a, Method b) {
         String pathA = javaFilePath(a);
         String pathB = javaFilePath(b);
-        String command = "/Users/matsumotojunnosuke/.bin/gum/bin/gumtree jsondiff" + pathA + " " + pathB;
+        String command = "/Users/matsumotojunnosuke/.bin/gum/bin/gumtree jsondiff " + pathA + " " + pathB;
         Runtime runtime = Runtime.getRuntime();
 
         Process process;
@@ -65,8 +68,10 @@ class SuggestLogic {
             while (true) {
                 String line = bufferedReader.readLine();
                 if (line == null) break;
-                text = "\n" + line;
+                text += "\n" + line;
             }
+            bufferedReader.close();
+            process.destroy();
             return text;
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,6 +90,7 @@ class SuggestLogic {
                 newFile.createNewFile();
                 FileWriter writer = new FileWriter(newFile);
                 writer.write(getCompleteSourceCode(method));
+                writer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -93,11 +99,15 @@ class SuggestLogic {
     }
 
     private String javaFilePath(Method method) {
-        return "./tmp/Class" + method.getId() + ".java";
+        return "./tmp/" + getClassName(method) + ".java";
     }
 
     private String getCompleteSourceCode(Method method) {
-        return "class Class" + method.getId() + " {\n" + method.getSourceCode() + "\n}";
+        return "class " + getClassName(method) + " {\n" + method.getSourceCode() + "\n}";
+    }
+
+    private String getClassName(Method method) {
+        return "Class" + method.getId();
     }
 
     private void setCache(Method a, Method b, int length) {
