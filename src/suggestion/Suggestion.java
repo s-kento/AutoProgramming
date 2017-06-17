@@ -11,6 +11,6 @@ public class Suggestion {
     private SuggestLogic logic;
 
     public Suggestion(List<String> list) {
-
+        store = new DataStore(list);
     }
 }
