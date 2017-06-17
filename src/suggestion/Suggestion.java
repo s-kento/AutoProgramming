@@ -12,5 +12,18 @@ public class Suggestion {
 
     public Suggestion(List<String> list) {
         store = new DataStore(list);
+        logic = new SuggestLogic(store);
+    }
+
+    public Boolean hasNext() {
+        return !store.getUncheckedMethods().isEmpty();
+    }
+
+    public String getNowSourceCode() {
+        return store.getNowMethod().getSourceCode();
+    }
+
+    public void next() {
+        logic.next();
     }
 }

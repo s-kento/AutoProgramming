@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Created by matsumotojunnosuke on 2017/06/17.
  */
-public class DataStore {
+class DataStore {
 
     private List<Method> uncheckedMethods = new ArrayList<>();
     private List<Method> checkedMethods = new ArrayList<>();
@@ -29,7 +29,7 @@ public class DataStore {
         checkMethod(nowMethod);
     }
 
-    private void next(Method nextMethod) {
+    void next(Method nextMethod) {
         checkMethod(nowMethod);
         nowMethod = nextMethod;
     }
@@ -59,5 +59,9 @@ public class DataStore {
 
     List<Method> getAllMethods() {
         return allMethods;
+    }
+
+    Method getNowMethod() {
+        return nowMethod;
     }
 }
