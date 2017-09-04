@@ -1,14 +1,18 @@
 package suggestion;
 
+import org.apache.commons.codec.DecoderException;
+import search.MethodInfo;
+
 /**
  * Created by matsumotojunnosuke on 2017/06/17.
  */
+
 public class Method {
     private int id;
-    private String sourceCode;
+    private MethodInfo info;
 
-    public Method(String sourceCode, int id) {
-        this.sourceCode = sourceCode;
+    Method(MethodInfo methodInfo, int id) throws DecoderException {
+        info = methodInfo;
         this.id = id;
     }
 
@@ -16,7 +20,7 @@ public class Method {
         return id;
     }
 
-    public String getSourceCode() {
-        return sourceCode;
+    public MethodInfo getInfo() {
+        return info;
     }
 }

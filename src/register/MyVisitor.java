@@ -143,6 +143,9 @@ public class MyVisitor extends ASTVisitor {
 			setParameterType(tmp);
 
 			showMethodInfo(this); // メソッド情報を標準出力に表示
+
+			// メソッドをDBに格納するかどうかの検証はここでするのが良さそう
+
 			try {// メソッド情報をデータベースに登録
 				db.register(this);
 			} catch (ClassNotFoundException | SQLException e) {

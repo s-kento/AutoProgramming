@@ -17,7 +17,7 @@ public class MethodInfo {
 	private String sourceCode;
 
 
-	MethodInfo(String filePath, String className, String methodName, String returnType, String parameterType,
+	public MethodInfo(String filePath, String className, String methodName, String returnType, String parameterType,
 			String projectName, int startLine, String sourceCode) throws DecoderException {
 		setFilePath(filePath);
 		setClassName(className);

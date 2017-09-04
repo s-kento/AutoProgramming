@@ -15,6 +15,7 @@ import suggestion.Suggestion;
  */
 
 public class Search {
+
 	public void execute(String[] args)
 			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
 		Config conf = new Config();
@@ -23,15 +24,13 @@ public class Search {
 		List<MethodInfo> methods = db.getMethodInfo(cl);
 		Ranker rank = new Ranker();
 		methods = rank.sortByMethodNameSimilarity("read", methods);
-		List<String> list = new ArrayList<>();
-		for(MethodInfo method:methods){
-			list.add(method.getSourceCode());
-		}
-		if (list.isEmpty()) return;
-		System.out.println(list.size() + " methods Hits\n");
+
+		String methodName = cl.getOptionValue("s");
+		if (methods.isEmpty()) return;
+		System.out.println(methods.size() + " methods Hits\n");
 
 		long start = System.currentTimeMillis();
-		Suggestion suggestion = new Suggestion(list);
+		Suggestion suggestion = new Suggestion(methods, methodName);
 		while (true) {
 			System.out.println(suggestion.getNowSourceCode());
 			if (!suggestion.hasNext()) break;

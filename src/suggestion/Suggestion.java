@@ -1,5 +1,8 @@
 package suggestion;
 
+import org.apache.commons.codec.DecoderException;
+import search.MethodInfo;
+
 import java.util.List;
 
 /**
@@ -10,8 +13,8 @@ public class Suggestion {
     private DataStore store;
     private SuggestLogic logic;
 
-    public Suggestion(List<String> list) {
-        store = new DataStore(list);
+    public  Suggestion(List<MethodInfo> list, String methodName) throws DecoderException {
+        store = new DataStore(list, methodName);
         logic = new SuggestLogic(store);
     }
 
@@ -20,7 +23,7 @@ public class Suggestion {
     }
 
     public String getNowSourceCode() {
-        return store.getNowMethod().getSourceCode();
+        return store.getNowMethod().getInfo().getSourceCode();
     }
 
     public void next() {

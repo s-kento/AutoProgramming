@@ -116,7 +116,7 @@ class SuggestLogic {
     }
 
     private String getCompleteSourceCode(Method method) {
-        return "class " + getClassName(method) + " {\n" + method.getSourceCode() + "\n}";
+        return "class " + getClassName(method) + " {\n" + method.getInfo().getSourceCode() + "\n}";
     }
 
     private String getClassName(Method method) {

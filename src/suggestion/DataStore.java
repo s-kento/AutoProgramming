@@ -1,5 +1,9 @@
 package suggestion;
 
+import org.apache.commons.codec.DecoderException;
+import search.MethodInfo;
+import search.Ranker;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,15 +17,26 @@ class DataStore {
     private List<Method> allMethods = new ArrayList<>();
     private Method nowMethod;
 
-    public DataStore(List<String> methods) {
+    public DataStore(List<MethodInfo> methods, String methodName) throws DecoderException {
         int id = 0;
-        for (String string: methods) {
-            Method method = new Method(string, id);
+        Ranker ranker = new Ranker();
+        float nowMethodLeven = 0;
+        for (MethodInfo methodInfo: methods) {
+            Method method = new Method(methodInfo, id);
             uncheckedMethods.add(method);
             allMethods.add(method);
             if (nowMethod == null) {
                 nowMethod = method;
-            } else if (nowMethod.getSourceCode().length() > method.getSourceCode().length()) {
+                if (methodName != null) {
+                    nowMethodLeven = ranker.calcLeven(nowMethod.getInfo().getMethodName(), methodName);
+                }
+            } else if (methodName != null) {
+                float leven = ranker.calcLeven(method.getInfo().getMethodName(), methodName);
+                if (leven > nowMethodLeven) {
+                    nowMethodLeven = leven;
+                    nowMethod = method;
+                }
+            } else if (nowMethod.getInfo().getSourceCode().length() > method.getInfo().getSourceCode().length()) {
                 nowMethod = method;
             }
             id += 1;
