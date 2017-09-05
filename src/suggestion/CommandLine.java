@@ -10,7 +10,6 @@ import java.util.concurrent.Callable;
  */
 public class CommandLine implements Callable<String> {
 
-    public String command = "";
     ProcessBuilder processBuilder;
 
     @Override

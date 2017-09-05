@@ -86,10 +86,8 @@ class SuggestLogic {
     private Future<String> executeGumtree(Method a, Method b) {
         String pathA = javaFilePath(a);
         String pathB = javaFilePath(b);
-        String command = "/Users/matsumotojunnosuke/.bin/gum/bin/gumtree jsondiff " + pathA + " " + pathB;
         CommandLine commandLine = new CommandLine();
-        commandLine.processBuilder = new ProcessBuilder("/Users/matsumotojunnosuke/.bin/gum/bin/gumtree", "jsondiff", pathA, pathB);
-        commandLine.command = command;
+        commandLine.processBuilder = new ProcessBuilder(getGumtreePath(), "jsondiff", pathA, pathB);
         Future<String> future = service.submit(commandLine);
         return future;
     }
@@ -137,5 +135,9 @@ class SuggestLogic {
         int min = Math.min(a.getId(), b.getId());
         int max = Math.max(a.getId(), b.getId());
         return String.valueOf(min) + "-" + String.valueOf(max);
+    }
+
+    private String getGumtreePath() {
+        return "./gumtree/bin/gumtree";
     }
 }
