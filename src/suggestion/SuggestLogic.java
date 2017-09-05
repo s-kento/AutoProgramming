@@ -49,9 +49,9 @@ class SuggestLogic {
 
     private void calculateLength(Method sourceMethod) {
         class TMPFuture {
-            Future<String> future;
-            Method method;
-            TMPFuture(Future<String> future, Method method) {
+            private Future<String> future;
+            private Method method;
+            private TMPFuture(Future<String> future, Method method) {
                 this.future = future;
                 this.method = method;
             }
