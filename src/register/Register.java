@@ -14,7 +14,11 @@ import search.Config;
  */
 
 public class Register {
-	public void execute(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
+	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
+		execute(args);
+	}
+
+	public static void execute(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);
 		SourceFileAnalyzer sfa = new SourceFileAnalyzer(cl.getOptionValue("f"));
