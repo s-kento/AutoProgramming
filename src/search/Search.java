@@ -14,11 +14,12 @@ import org.apache.commons.codec.DecoderException;
 
 public class Search {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
-		execute(args);
+		Search sr = new Search();
+		sr.execute(args);
 	}
 
 
-	public static void execute(String[] args)
+	public void execute(String[] args)
 			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);

@@ -2,11 +2,12 @@ package transformation;
 
 public class Transformation {
 	public static void main(String[] args) {
-		execute(args);
+		Transformation tr = new Transformation();
+		tr.execute(args);
 	}
 
 
-	public static void execute(String[] args) {
+	public void execute(String[] args) {
 		Controller cr = new Controller();
 
 		long start = System.currentTimeMillis();
