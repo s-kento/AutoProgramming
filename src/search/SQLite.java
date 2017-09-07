@@ -97,9 +97,6 @@ public class SQLite {
 		if (cl.hasOption("c")) {
 			sql += " and classname=\'" + cl.getOptionValue("c") + "\'";
 		}
-		if (cl.hasOption("m")) {
-			sql += " and methodname=\'" + cl.getOptionValue("m") + "\'";
-		}
 		if (cl.hasOption("r")) {
 			sql += " and returntype=\'" + cl.getOptionValue("r") + "\'";
 		}

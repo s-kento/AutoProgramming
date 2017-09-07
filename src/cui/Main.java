@@ -1,12 +1,7 @@
 package cui;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
-
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.codec.DecoderException;
 
 import register.Register;
 import search.MethodInfo;
@@ -18,7 +13,7 @@ import transformation.Transformation;
  */
 public class Main {
 	public static void main(String[] args)
-			throws ClassNotFoundException, SQLException, IOException, ParseException, DecoderException {
+			throws Exception {
 		while(true){
 			System.out.print(">");
 			Scanner scan = new Scanner(System.in);

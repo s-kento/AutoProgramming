@@ -29,7 +29,7 @@ public class Search {
 		SQLite db = new SQLite(cl.getOptionValue("d"), cl.getOptionValue("t"));
 		List<MethodInfo> methods = db.getMethodInfo(cl);
 		Ranker rank = new Ranker();
-		methods = rank.sortByMethodNameSimilarity("read", methods);
+		methods = rank.sortByMethodNameSimilarity(cl.getOptionValue("m"), methods);
 		return methods;
 	}
 }
