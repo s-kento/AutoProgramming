@@ -15,11 +15,14 @@ import org.apache.commons.codec.DecoderException;
 public class Search {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
 		Search sr = new Search();
-		sr.execute(args);
+		List<MethodInfo> methods=sr.execute(args);
+		for(MethodInfo method:methods){
+			System.out.println(method.getSourceCode());
+		}
 	}
 
 
-	public void execute(String[] args)
+	public List<MethodInfo> execute(String[] args)
 			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);
@@ -27,8 +30,6 @@ public class Search {
 		List<MethodInfo> methods = db.getMethodInfo(cl);
 		Ranker rank = new Ranker();
 		methods = rank.sortByMethodNameSimilarity("read", methods);
-		for(MethodInfo method:methods){
-			System.out.println(method.getSourceCode());
-		}
+		return methods;
 	}
 }

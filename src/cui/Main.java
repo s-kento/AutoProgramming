@@ -2,12 +2,14 @@ package cui;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
 
 import register.Register;
+import search.MethodInfo;
 import search.Search;
 import transformation.Transformation;
 
@@ -28,7 +30,10 @@ public class Main {
 			}else if(in.equals("search")){
 				Search search = new Search();
 				String arg = scan.nextLine();
-				search.execute(arg.split("[\\s]+"));
+				List<MethodInfo> methods=search.execute(arg.split("[\\s]+"));
+				for(MethodInfo method:methods){
+					System.out.println(method.getSourceCode());
+				}
 			}else if(in.equals("trans")){
 				Transformation trans = new Transformation();
 				String arg = scan.nextLine();
