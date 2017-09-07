@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1499916023751
+Build-Jdk: 1.8.0_102
+Built-By: s-kento
+Bundle-Description: Apache Commons Text is a library focused on algorith
+ ms working on strings.
+Bundle-DocURL: http://commons.apache.org/proper/commons-text/
+Bundle-License: https://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-ManifestVersion: 2
+Bundle-Name: Apache Commons Text
+Bundle-SymbolicName: org.apache.commons.text
+Bundle-Vendor: The Apache Software Foundation
+Bundle-Version: 1.0.0
+Created-By: Apache Maven Bundle Plugin
+Export-Package: org.apache.commons.text;version="1.0",org.apache.commons
+ .text.diff;version="1.0",org.apache.commons.text.similarity;version="1.
+ 0",org.apache.commons.text.translate;version="1.0"
+Import-Package: org.apache.commons.lang3
+Include-Resource: META-INF/LICENSE.txt=LICENSE.txt,META-INF/NOTICE.txt=N
+ OTICE.txt
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.7))"
+Tool: Bnd-3.0.0.201509101326

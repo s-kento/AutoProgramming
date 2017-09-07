@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" name="org.apache.commons.text.StrBuilderTest" time="0.004" tests="90" errors="0" skipped="0" failures="1">
+  <properties>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="sun.boot.library.path" value="C:\pleiades\java\7\jre\bin"/>
+    <property name="java.vm.version" value="24.80-b11"/>
+    <property name="java.vm.vendor" value="Oracle Corporation"/>
+    <property name="maven.multiModuleProjectDirectory" value="C:\Users\s-kento\git\winastor\commons-text-1.0"/>
+    <property name="java.vendor.url" value="http://java.oracle.com/"/>
+    <property name="path.separator" value=";"/>
+    <property name="guice.disable.misplaced.annotation.check" value="true"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) 64-Bit Server VM"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="user.script" value=""/>
+    <property name="user.country" value="JP"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="user.dir" value="C:\Users\s-kento\git\winastor\commons-text-1.0"/>
+    <property name="java.runtime.version" value="1.7.0_80-b15"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.Win32GraphicsEnvironment"/>
+    <property name="java.endorsed.dirs" value="C:\pleiades\java\7\jre\lib\endorsed"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.io.tmpdir" value="C:\Users\s-kento\AppData\Local\Temp\"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.variant" value=""/>
+    <property name="os.name" value="Windows 8.1"/>
+    <property name="classworlds.conf" value="C:\pleiades\workspace\.metadata\.plugins\org.eclipse.m2e.launching\launches\m2conf7283314888742865512.tmp"/>
+    <property name="sun.jnu.encoding" value="MS932"/>
+    <property name="java.library.path" value="C:\pleiades\java\7\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:/pleiades/eclipse/jre/bin/../jre/bin/server;C:/pleiades/eclipse/jre/bin/../jre/bin;C:/pleiades/eclipse/jre/bin/../jre/lib/amd64;C:\ProgramData\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\ATI Technologies\ATI.ACE\Core-Static;C:\Program Files (x86)\Git\cmd;C:\w32tex\bin;C:\Program Files (x86)\gs\gs9.16\bin;C:\Program Files (x86)\gs\gs9.16\lib;C:\Program Files\TortoiseGit\bin;C:\Program Files\nodejs\;C:\Program Files (x86)\Windows Live\Shared;C:\Program Files (x86)\GtkSharp\2.12\bin;C:\Users\s-kento\AppData\Roaming\npm;C:\Users\s-kento\AppData\Local\Microsoft\WindowsApps;C:\Program Files\Java\jdk1.8.0_45\bin;C:\pleiades\tomcat\8\bin;;C:\pleiades\eclipse;;."/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.class.version" value="51.0"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="os.version" value="6.3"/>
+    <property name="user.home" value="C:\Users\s-kento"/>
+    <property name="user.timezone" value="Asia/Tokyo"/>
+    <property name="java.awt.printerjob" value="sun.awt.windows.WPrinterJob"/>
+    <property name="java.specification.version" value="1.7"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="user.name" value="s-kento"/>
+    <property name="java.class.path" value="/C:/pleiades/eclipse/plugins/org.eclipse.m2e.maven.runtime_1.7.0.20160603-1931/jars/plexus-classworlds-2.5.2.jar"/>
+    <property name="java.vm.specification.version" value="1.7"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.home" value="C:\pleiades\java\7\jre"/>
+    <property name="sun.java.command" value="org.codehaus.plexus.classworlds.launcher.Launcher -B test"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="user.language" value="ja"/>
+    <property name="awt.toolkit" value="sun.awt.windows.WToolkit"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="java.version" value="1.7.0_80"/>
+    <property name="java.ext.dirs" value="C:\pleiades\java\7\jre\lib\ext;C:\WINDOWS\Sun\Java\lib\ext"/>
+    <property name="sun.boot.class.path" value="C:\pleiades\java\7\jre\lib\resources.jar;C:\pleiades\java\7\jre\lib\rt.jar;C:\pleiades\java\7\jre\lib\sunrsasign.jar;C:\pleiades\java\7\jre\lib\jsse.jar;C:\pleiades\java\7\jre\lib\jce.jar;C:\pleiades\java\7\jre\lib\charsets.jar;C:\pleiades\java\7\jre\lib\jfr.jar;C:\pleiades\java\7\jre\classes"/>
+    <property name="java.vendor" value="Oracle Corporation"/>
+    <property name="maven.home" value="C:\Users\s-kento\git\winastor\commons-text-1.0\EMBEDDED"/>
+    <property name="file.separator" value="\"/>
+    <property name="java.vendor.url.bug" value="http://bugreport.sun.com/bugreport/"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="sun.desktop" value="windows"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+  </properties>
+  <testcase name="testAsTokenizer" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteFirst_StrMatcher" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplaceFirst_StrMatcher_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteAll_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testEndsWith" classname="org.apache.commons.text.StrBuilderTest" time="0.001">
+    <failure type="java.lang.AssertionError">java.lang.AssertionError
+	at org.apache.commons.text.StrBuilderTest.testEndsWith(StrBuilderTest.java:1186)
+</failure>
+  </testcase>
+  <testcase name="testGetSetNullText" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReadFromReaderAppendsToEnd" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIndexOfLang294" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testSubSequenceIntInt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testGetChars" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLastIndexOf_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteAll_char" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplace_StrMatcher_String_int_int_int_VaryEndIndex" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLastIndexOf_char_int" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReadFromReadable" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAppendToStringBuffer" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testClear" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testSize" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testTrim" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testRightString" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testToString" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testConstructors" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReadFromCharBuffer" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testMinimizeCapacity" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testSubstringIntInt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLang412Left" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testContains_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testEqualsIgnoreCase" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testCapacityAndLength" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReadFromReadableAppendsToEnd" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAsReader" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testToStringBuilder" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplaceAll_String_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAsWriter" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLang294" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLang295" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplaceAll_char_char" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLastIndexOf_String_int" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteCharAt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplaceFirst_String_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testContains_char" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteIntInt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplace_StrMatcher_String_int_int_int_VaryCount" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplaceFirst_char_char" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIndexOf_char" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplace_int_int_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testToCharArray" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLastIndexOf_StrMatcher" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIndexOf_StrMatcher_int" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testEnsureCapacity" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLang412Right" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteFirst_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAppendToStringBuilder" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testMidString" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplaceAll_StrMatcher_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testCapacity" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReadFromCharBufferAppendsToEnd" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReverse" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testSetCharAt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplace_StrMatcher_String_int_int_int_VaryStartIndex" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testHashCode" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testSubstringInt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="test_LANG_1131_EqualsWithNullStrBuilder" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testSetLength" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAppendToWriter" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testCharAt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplace_StrMatcher_String_int_int_int_VaryMatcher" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testEquals" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLastIndexOf_char" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLeftString" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIndexOf_String_int" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testContains_StrMatcher" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLength" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReplace_StrMatcher_String_int_int_int_VaryReplace" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteFirst_char" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAppendToCharBuffer" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testDeleteAll_StrMatcher" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIsEmpty" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testToCharArrayIntInt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testGetSetNewLineText" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testToStringBuffer" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testReadFromReader" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAsBuilder" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIndexOf_String" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIndexOf_char_int" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testGetCharsIntIntCharArrayInt" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testIndexOf_StrMatcher" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testAppendCharBuffer" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testLastIndexOf_StrMatcher_int" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+  <testcase name="testChaining" classname="org.apache.commons.text.StrBuilderTest" time="0"/>
+</testsuite>
