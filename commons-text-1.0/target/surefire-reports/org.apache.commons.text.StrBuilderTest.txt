@@ -1,0 +1,8 @@
+-------------------------------------------------------------------------------
+Test set: org.apache.commons.text.StrBuilderTest
+-------------------------------------------------------------------------------
+Tests run: 90, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.004 sec <<< FAILURE! - in org.apache.commons.text.StrBuilderTest
+testEndsWith(org.apache.commons.text.StrBuilderTest)  Time elapsed: 0.001 sec  <<< FAILURE!
+java.lang.AssertionError
+	at org.apache.commons.text.StrBuilderTest.testEndsWith(StrBuilderTest.java:1186)
+

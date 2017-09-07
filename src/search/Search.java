@@ -15,28 +15,22 @@ import suggestion.Suggestion;
  */
 
 public class Search {
+        public static void main(String[] args) throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
+		Search sr = new Search();
+		List<MethodInfo> methods=sr.execute(args);
+		for(MethodInfo method:methods){
+			System.out.println(method.getSourceCode());
+		}
+	}
 
-	public void execute(String[] args)
-			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
+
+	public List<MethodInfo> execute(String[] args) throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);
 		SQLite db = new SQLite(cl.getOptionValue("d"), cl.getOptionValue("t"));
 		List<MethodInfo> methods = db.getMethodInfo(cl);
 		Ranker rank = new Ranker();
-		methods = rank.sortByMethodNameSimilarity("read", methods);
-
-		String methodName = cl.getOptionValue("s");
-		if (methods.isEmpty()) return;
-		System.out.println(methods.size() + " methods Hits\n");
-
-		long start = System.currentTimeMillis();
-		Suggestion suggestion = new Suggestion(methods, methodName);
-		while (true) {
-			System.out.println(suggestion.getNowSourceCode());
-			if (!suggestion.hasNext()) break;
-			suggestion.next();
-		}
-		long end = System.currentTimeMillis();
-		System.out.println("runtime: " + (end - start)  + "ms");
+		methods = rank.sortByMethodNameSimilarity(cl.getOptionValue("m"), methods);
+		return methods;
 	}
 }

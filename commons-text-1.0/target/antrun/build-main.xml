@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<project name="maven-antrun-" default="main"  >
+<target name="main">
+  <copy todir="C:\Users\s-kento\git\winastor\commons-text-1.0\target/apidocs/META-INF">
+    <fileset dir="C:\Users\s-kento\git\winastor\commons-text-1.0">
+      <include name="LICENSE.txt"/>
+      <include name="NOTICE.txt"/>
+    </fileset>
+  </copy>
+</target>
+</project>
