@@ -9,5 +9,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="apache-lucene-spellchecker" level="project" />
+    <orderEntry type="library" name="aastor" level="project" />
   </component>
 </module>
