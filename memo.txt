@@ -1,0 +1,36 @@
+genprogにプロジェクトを食わせるとき，package-info.javaが邪魔をしている．
+package-info.javaの拡張子を消して，とりあえず認識させないようにする．
+コマンド→find . -name package-info.java | xargs rename package-info.java pacakge-info
+
+Astorの引数(例)
+-location ./commons-lang3-3.5
+-dependencies ./commons-lang3-3.5/libs/easymock-3.4.jar;./commons-lang3-3.5/libs/hamcrest-all-1.3.jar;./commons-lang3-3.5/libs/commons-io-2.5.jar;./commons-lang3-3.5/libs/junit-4.12.jar;./commons-lang3-3.5/libs/objenesis-2.2.jar
+-mode jgenprog -scope package -failing
+org.apache.commons.lang3.TempTest
+-srcjavafolder /src/main/java/ -srctestfolder /src/test/
+-binjavafolder /target/classes
+-bintestfolder /target/test-classes
+-flthreshold 0.5 -seed 10 -maxtime 100 -stopfirst true
+ -javacompliancelevel 8
+ 
+ -scope <arg>                            (Optional) Scope of the
+                                         ingredient seach space: Local
+                                         (same class), package (classes
+                                         from the same package) or global
+                                         (all classes from the application
+                                         under analysis). Default: local.
+                                         It accepts customize scopes,
+                                         which must implement from
+                                         fr.inria.astor.core.loop.spaces.i
+                                         ngredients.scopes.AstorCtIngredie
+                                         ntSpace
+
+Astorの引数(endswith→startswith)
+-location ./commons-text-1.0
+-mode jgenprog -scope global -failing
+org.apache.commons.text.StrBuilderTest
+-srcjavafolder /src/main/java/ -srctestfolder /src/test/
+-binjavafolder /target/classes
+-bintestfolder /target/test-classes
+-flthreshold 0.5 -seed 4 -maxtime 100 -stopfirst true
+-dependencies ./commons-text-1.0/lib/hamcrest-all-1.3.jar:./commons-text-1.0/lib/hamcrest-core-1.3.jar;./commons-text-1.0/lib/junit-4.12.jar;./commons-text-1.0/lib/commons-lang3.jar
