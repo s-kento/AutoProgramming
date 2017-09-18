@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AutoProgramming.iml" filepath="$PROJECT_DIR$/AutoProgramming.iml" />
+      <module fileurl="file://$PROJECT_DIR$/astor/astor.iml" filepath="$PROJECT_DIR$/astor/astor.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons-text-1.0/commons-text.iml" filepath="$PROJECT_DIR$/commons-text-1.0/commons-text.iml" />
     </modules>
   </component>
 </project>
