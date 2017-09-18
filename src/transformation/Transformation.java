@@ -1,19 +1,28 @@
 package transformation;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.TextEditGroup;
+
+import register.SourceFileAnalyzer;
 import search.MethodInfo;
 import search.Search;
 
 public class Transformation {
-	public static void main(String[] args)
-			throws Exception {
+	public static void main(String[] args) throws Exception {
 		Transformation tr = new Transformation();
 		tr.execute(args);
 	}
 
-	public void execute(String[] args)
-			throws Exception {
+	public void execute(String[] args) throws Exception {
 		Search search = new Search();
 		List<MethodInfo> methods = search.execute(args);
 		/*
@@ -28,21 +37,43 @@ public class Transformation {
 		gen.execute(arguments);
 	}
 
-	/*
-	 * public void execute(String[] args) { Controller cr = new Controller();
+	/**
+	 * メソッドAのコードをメソッドBのコードに置き換える
 	 *
-	 * long start = System.currentTimeMillis();
-	 * cr.extractJavaFile("MachineLearning.jar", "IdentifybyName.java"); long
-	 * end = System.currentTimeMillis(); System.out.println((end - start) +
-	 * "ms");
-	 *
-	 * start = System.currentTimeMillis(); cr.compile("MachineLearning.jar",
-	 * "IdentifybyName.java"); end = System.currentTimeMillis();
-	 * System.out.println((end - start) + "ms");
-	 *
-	 * start = System.currentTimeMillis();
-	 * System.out.println(cr.run("commons-io-2.5.jar", "ByteOrderMark.java",
-	 * "org.apache.commons.io", "ByteOrderMark", "length", "null", null)); end =
-	 * System.currentTimeMillis(); System.out.println((end - start) + "ms"); }
+	 * @param
 	 */
+	public ASTRewrite replaceCode(MethodInfo methodA, MethodInfo methodB) throws IOException {
+		SourceFileAnalyzer sfa = new SourceFileAnalyzer();
+		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
+		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
+		ReplaceVisitor visitorA = new ReplaceVisitor(unitA,methodA);
+		visitorA.doReplace();
+		ReplaceVisitor visitorB = new ReplaceVisitor(unitB,methodB);
+		unitB.accept(visitorB);
+		visitorA.setReplacement(visitorB.getMethodNode());
+		unitA.accept(visitorA);
+		System.out.println(unitA.toString());
+
+
+		//return unitA;
+		return visitorA.getRewriter();
+	}
+
+	/**
+	 * ASTからソースコードを復元
+	 * @param ソースコード，AST
+	 * @return ソースコード
+	 */
+	public String getCode(String code, ASTRewrite rewriter) {
+		IDocument eDoc = new Document(code);
+		//TextEdit edit = unit.rewrite(eDoc, null);
+		TextEdit edit = rewriter.rewriteAST(eDoc, null);
+		try {
+			edit.apply(eDoc);
+			return eDoc.get();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

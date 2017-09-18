@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-/*
+/**
  * ソースファイルの解析をするクラス
  * @author s-kento
  */
@@ -24,26 +24,26 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class SourceFileAnalyzer {
 	private List<String> fileList = new ArrayList<String>(); // ターゲットファイル群．ファイルの絶対パスを格納
 
-	SourceFileAnalyzer(String file) { // コンストラクタ
+	public SourceFileAnalyzer(String file) throws IOException { // コンストラクタ
 		setFileList(new File(file));
 	}
+	public SourceFileAnalyzer(){
 
-	/*
+	}
+
+
+	/**
 	 * 指定したディレクトリ下のファイル名(絶対パス)をfileList変数に格納する
 	 *
 	 * @param file ターゲットディレクトリ
+	 * @throws IOException
 	 */
-	public void setFileList(File file) {
-		if (file.isDirectory()) {
-			File[] innerFiles = file.listFiles();
-			for (File tmp : innerFiles) {
-				setFileList(tmp);
-			}
-		} else if (file.isFile()) {
-			if (file.getName().endsWith(".java")) {
-				fileList.add(file.getAbsolutePath());
-			}
-		}
+	public void setFileList(File file) throws IOException {
+		this.fileList =  Files.walk(file.toPath())
+				.filter(e -> !Files.isDirectory(e))
+				.filter(e -> e.toString().endsWith(".java"))
+				.map(e -> e.toString())
+				.collect(Collectors.toList());
 	}
 
 	/*
@@ -55,7 +55,7 @@ public class SourceFileAnalyzer {
 		return fileList;
 	}
 
-	/*
+	/**
 	 * ソースコードのASTを返す
 	 *
 	 * @param filePath ファイルの絶対パス
@@ -76,6 +76,7 @@ public class SourceFileAnalyzer {
 		parser.setSource(source.toCharArray());
 		parser.setUnitName("Target.java");
 		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+		unit.recordModifications();
 		/*String source = Files.lines(Paths.get(filePath), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 		ASTParser parser = ASTParser.newParser(AST.JLS4);

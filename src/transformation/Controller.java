@@ -24,7 +24,7 @@ import javax.tools.ToolProvider;
  * メソッド書き換えやリコンパイル，メソッド実行を担当するクラス
  */
 public class Controller {
-	/*
+	/**
 	 * jarファイルから指定したjavaファイルを抽出する
 	 *
 	 * @param fileName 抽出したいJavaファイル
@@ -38,7 +38,7 @@ public class Controller {
 		}
 	}
 
-	/*
+	/**
 	 * jarファイルからエントリを抽出し，文字列として読み込んで新規ファイルに書き込む
 	 *
 	 * @param zipFile jarファイル
@@ -69,7 +69,7 @@ public class Controller {
 		pw.close();
 	}
 
-	/*
+	/**
 	 * 書き換えたメソッドを含むjavaファイルをコンパイルし，クラスファイルを生成する
 	 *
 	 * @param zipFile jarファイル
@@ -86,7 +86,7 @@ public class Controller {
 			throw new RuntimeException("コンパイル失敗:" + r);
 	}
 
-	/*
+	/**
 	 * メソッドを実行する
 	 * @param jarFileName jarファイル名
 	 * @param javaFileName javaファイル名
@@ -117,7 +117,7 @@ public class Controller {
 		return r;
 	}
 
-	/*
+	/**
 	 * カンマ区切りの型名から，Classクラスの配列を返す
 	 * @param parameterTypes 引数の型，カンマ区切り
 	 * @return classes Classクラスの配列
@@ -137,7 +137,7 @@ public class Controller {
 		return classes;
 	}
 
-	/*
+	/**
 	 * ファイル名に.jarがついてなければつける
 	 * @param original jarファイル名
 	 * @return adjusted 拡張子付きのファイル名
