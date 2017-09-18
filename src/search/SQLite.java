@@ -44,9 +44,16 @@ public class SQLite {
 		statement = connection.createStatement();
 		List<String> parameterType = visitor.getParameterType();
 
+		/* テーブルがなければ作成する */
+		String sql = "create table if not exists " +table
+				+ "(filepath text, classname text, methodname text, returntype text, parametertype text, projectname text, startline numeric, sourcecode text)";
+		statement.executeUpdate(sql);
+		sql="create index if not exists signature on "+table+"(returntype,parametertype)";
+		statement.executeUpdate(sql);
+
 		/* SQL文の作成・ここから */
-		String sql = "insert into " + table + " values(\'" + visitor.getFilePath() + "\',\'" + visitor.getClassName()
-				+ "\',\'" + visitor.getMethodName() + "\',\'" + visitor.getReturnType() + "\',\'";
+		sql = "insert into " + table + " values(\'" + visitor.getFilePath() + "\',\'" + visitor.getClassName() + "\',\'"
+				+ visitor.getMethodName() + "\',\'" + visitor.getReturnType() + "\',\'";
 		String params = "";
 		for (int i = 0; i < parameterType.size(); i++) {
 			params += parameterType.get(i);
@@ -140,5 +147,4 @@ public class SQLite {
 		}
 		return methods;
 	}
-
 }
