@@ -72,18 +72,19 @@ public class Controller {
 	/**
 	 * 書き換えたメソッドを含むjavaファイルをコンパイルし，クラスファイルを生成する
 	 *
-	 * @param zipFile jarファイル
+	 * @param jarFileName プロジェクトのjarファイル名
 	 *
-	 * @param name 抽出したいJavaファイル
+	 * @param javaFileName コンパイルしたいJavaファイル名
+	 *
+	 * @return r 0ならコンパイル成功
 	 */
-	public void compile(String jarFileName, String javaFileName) {
+	public int compile(String jarFileName, String javaFileName) {
 		File src = new File("work\\" + javaFileName);
-		String[] args = { "-classpath", "C:\\pleiades\\workspace\\AutoProgramming\\work\\" + jarFileName,
+		String[] args = { "-classpath", jarFileName,
 				src.getAbsolutePath() };
 		JavaCompiler c = ToolProvider.getSystemJavaCompiler();
 		int r = c.run(null, null, null, args);
-		if (r != 0)
-			throw new RuntimeException("コンパイル失敗:" + r);
+		return r;
 	}
 
 	/**

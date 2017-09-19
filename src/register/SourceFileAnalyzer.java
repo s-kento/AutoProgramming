@@ -3,6 +3,7 @@ package register;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,8 +25,8 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class SourceFileAnalyzer {
 	private List<String> fileList = new ArrayList<String>(); // ターゲットファイル群．ファイルの絶対パスを格納
 
-	public SourceFileAnalyzer(String file) throws IOException { // コンストラクタ
-		setFileList(new File(file));
+	public SourceFileAnalyzer(File file) throws IOException { // コンストラクタ
+		setFileList(file);
 	}
 	public SourceFileAnalyzer(){
 
@@ -63,7 +64,7 @@ public class SourceFileAnalyzer {
 	 * @return CompolationUnit ソースコードのAST
 	 */
 	public CompilationUnit getAST(String filePath) throws IOException {
-		String source = Files.lines(Paths.get(filePath), Charset.forName("UTF-8"))
+		String source = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 		parser.setBindingsRecovery(true);

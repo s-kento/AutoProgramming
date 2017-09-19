@@ -10,6 +10,7 @@ public class Config {
 	public CommandLine getOptions(String[] args) throws ParseException {
 		Options options = new Options();
 		options.addOption("p", "parametertype", true, "パラメータの型");
+		options.addOption("P","project",true,"プロジェクト名");
 		options.addOption("f", "filepath", true, "ファイルパス");
 		options.addOption("c", "classname", true, "クラス名");
 		options.addOption("m", "methodname", true, "メソッド名");

@@ -4,6 +4,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -36,6 +37,8 @@ public class ReplaceVisitor extends ASTVisitor {
 	}
 
 	public void setReplacement(MethodDeclaration replacement) {
+		AST ast = replacement.getAST();
+		replacement.setName(ast.newSimpleName(method.getMethodName()));
 		this.replacement = replacement;
 	}
 
@@ -61,6 +64,7 @@ public class ReplaceVisitor extends ASTVisitor {
 				ASTRewrite rewriter = ASTRewrite.create(ast);
 				TextEditGroup editGroup = new TextEditGroup("Replacing nodes");
 				rewriter.replace(node, getReplacement(), editGroup);
+				node.setName(ast.newSimpleName(method.getMethodName()));
 				setRewriter(rewriter);
 			}
 		}

@@ -55,8 +55,8 @@ public class Test {
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException, ParseException, DecoderException {
 		// test1();
 		// test6();
-		//test7();
-		test8();
+		test7();
+		//test8();
 
 	}
 
@@ -196,10 +196,10 @@ public class Test {
 	public static void test7() throws IOException {
 
 		ProcessBuilder pb = new ProcessBuilder(
-				"C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test");
+				"C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test","-Dtest=DerivativeStructureTest");
 		// ProcessBuilder pb = new ProcessBuilder("maven","test");
 		pb.redirectErrorStream(true);
-		pb.directory(new File(".\\commons-text-1.0"));
+		pb.directory(new File("work\\commons-math"));
 		Process process = pb.start();
 		InputStream is = process.getInputStream(); // 標準出力
 		printInputStream(is);
@@ -222,15 +222,12 @@ public class Test {
 	public static void test8()
 			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
 		Search search = new Search();
-		String[] args = { "-r", "void", "-p", "java.lang.String","-m","a" };
+		String[] args = { "-r", "java.lang.String", "-p", "int","-m","a" };
 		List<MethodInfo> methods = search.execute(args);
 		Transformation trans = new Transformation();
 		System.out.println(methods.get(0).getSourceCode());
-		System.out.println(methods.get(1).getSourceCode());
-		//CompilationUnit unit = trans.replaceCode(methods.get(0), methods.get(1));
-		ASTRewrite rewriter = trans.replaceCode(methods.get(0), methods.get(1));
-		String source = Files.lines(Paths.get(methods.get(0).getFilePath()), Charset.forName("UTF-8"))
-				.collect(Collectors.joining(System.getProperty("line.separator")));
-		System.out.println(trans.getCode(source, rewriter));
+		System.out.println(methods.get(2).getSourceCode());
+		System.out.println(trans.replaceCode(methods.get(0), methods.get(2)));
+
 	}
 }

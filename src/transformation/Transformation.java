@@ -1,10 +1,15 @@
 package transformation;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jface.text.Document;
@@ -23,50 +28,56 @@ public class Transformation {
 	}
 
 	public void execute(String[] args) throws Exception {
-		Search search = new Search();
-		List<MethodInfo> methods = search.execute(args);
-		/*
-		 * ここらへんで，GenProgに渡す適当な引数を生成する(テストケース生成も含めて)：未実装
-		 */
 		GenProg gen = new GenProg();
-		String[] arguments = { "-location", "./commons-text-1.0", "-mode", "jgenprog", "-scope", "global", "-failing",
+		/*String[] arguments = { "-location", "./commons-text-1.0", "-mode", "jgenprog", "-scope", "global", "-failing",
 				"org.apache.commons.text.StrBuilderTest", "-srcjavafolder", "/src/main/java/", "-srctestfolder",
 				"/src/test/", "-binjavafolder", "/target/classes", "-bintestfolder", "/target/test-classes",
 				"-flthreshold", "0.5", "-seed", "4", "-maxtime", "100", "-stopfirst", "true", "-dependencies",
-				"./commons-text-1.0/lib/hamcrest-all-1.3.jar:./commons-text-1.0/lib/hamcrest-core-1.3.jar;./commons-text-1.0/lib/junit-4.12.jar;./commons-text-1.0/lib/commons-lang3.jar" };
-		gen.execute(arguments);
+				"./commons-text-1.0/lib/hamcrest-all-1.3.jar:./commons-text-1.0/lib/hamcrest-core-1.3.jar;./commons-text-1.0/lib/junit-4.12.jar;./commons-text-1.0/lib/commons-lang3.jar" };*/
+		gen.execute(args);
 	}
 
 	/**
 	 * メソッドAのコードをメソッドBのコードに置き換える
 	 *
-	 * @param
+	 * @param methodA 書き換え先
+	 * @param methodB 書き換え元
+	 * @return replacedSourceCode 書き換え後のソースコード全体
 	 */
-	public ASTRewrite replaceCode(MethodInfo methodA, MethodInfo methodB) throws IOException {
+	public String replaceCode(MethodInfo methodA, MethodInfo methodB) throws IOException {
 		SourceFileAnalyzer sfa = new SourceFileAnalyzer();
 		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
 		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
-		ReplaceVisitor visitorA = new ReplaceVisitor(unitA,methodA);
+		/*String packageA = unitA.getPackage().toString();//import文の追加
+		String packageB = unitB.getPackage().toString();
+		if (!packageA.equals(packageB)) {
+			if (!existsImport(unitA, methodB)) {
+				addImport(unitA, methodA, methodB);
+			}
+		}*/
+		ReplaceVisitor visitorA = new ReplaceVisitor(unitA, methodA);
 		visitorA.doReplace();
-		ReplaceVisitor visitorB = new ReplaceVisitor(unitB,methodB);
+		ReplaceVisitor visitorB = new ReplaceVisitor(unitB, methodB);
 		unitB.accept(visitorB);
 		visitorA.setReplacement(visitorB.getMethodNode());
 		unitA.accept(visitorA);
-		System.out.println(unitA.toString());
+		ASTRewrite rewriter = visitorA.getRewriter();
+		String source = Files.lines(Paths.get(methodA.getFilePath()), Charset.forName("UTF-8"))
+				.collect(Collectors.joining(System.getProperty("line.separator")));
+		String replacedSourceCode=getCode(source, rewriter);
 
-
-		//return unitA;
-		return visitorA.getRewriter();
+		return replacedSourceCode;
 	}
 
 	/**
 	 * ASTからソースコードを復元
+	 *
 	 * @param ソースコード，AST
 	 * @return ソースコード
 	 */
 	public String getCode(String code, ASTRewrite rewriter) {
 		IDocument eDoc = new Document(code);
-		//TextEdit edit = unit.rewrite(eDoc, null);
+		// TextEdit edit = unit.rewrite(eDoc, null);
 		TextEdit edit = rewriter.rewriteAST(eDoc, null);
 		try {
 			edit.apply(eDoc);
@@ -75,5 +86,27 @@ public class Transformation {
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	public boolean existsImport(CompilationUnit unit, MethodInfo method) {
+		boolean exist = false;
+		List<ImportDeclaration> ids = unit.imports();
+		for (ImportDeclaration id : ids) {
+			if (id.getName().toString().equals(method.getClassName())) {
+				exist = true;
+				break;
+			}
+		}
+		return exist;
+	}
+
+	public void addImport(CompilationUnit unit, MethodInfo methodA, MethodInfo methodB) throws IOException {
+		Document doc = new Document(Files.lines(Paths.get(methodA.getFilePath()), Charset.forName("UTF-8"))
+				.collect(Collectors.joining(System.getProperty("line.separator"))));
+		AST ast = unit.getAST();
+		ImportDeclaration id = ast.newImportDeclaration();
+		id.setName(ast.newName(methodB.getClassName()));
+		unit.imports().add(id);
+		unit.rewrite(doc, null);//うまくいかない
 	}
 }
