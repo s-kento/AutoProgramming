@@ -23,10 +23,9 @@ import transformation.Controller;
 import transformation.Transformation;
 
 public class Main {
-	public static void main(String[] args)
-			throws Exception {
-		//initialize();
-		 execute(args);
+	public static void main(String[] args) throws Exception {
+		// initialize();
+		execute(args);
 
 	}
 
@@ -78,10 +77,10 @@ public class Main {
 				}
 				if (testFailed(targetClassName, toPackageName(targetAbsClassName))) {
 					String[] arguments = { "-location", "./work/commons-math", "-mode", "jgenprog", "-scope", "global",
-							"-failing", targetAbsClassName+"Test", "-srcjavafolder", "/src/main/java/",
+							"-failing", targetAbsClassName + "Test", "-srcjavafolder", "/src/main/java/",
 							"-srctestfolder", "/src/test/", "-binjavafolder", "/target/classes", "-bintestfolder",
 							"/target/test-classes", "-flthreshold", "0.5", "-seed", "4", "-maxtime", "100",
-							"-stopfirst", "true", "-dependencies",dependencies };
+							"-stopfirst", "true", "-dependencies", dependencies };
 					trans.execute(arguments);
 				}
 			}
@@ -123,7 +122,7 @@ public class Main {
 		return directoryName;
 	}
 
-	public static String toPackageName(String absClassName){
+	public static String toPackageName(String absClassName) {
 		int index = absClassName.lastIndexOf(".");
 		String packageName = absClassName.substring(0, index);
 		return packageName;
@@ -167,17 +166,13 @@ public class Main {
 	public static boolean testFailed(String className, String packageName) throws IOException, InterruptedException {
 		boolean failed = false;
 		String testClassName = className + "Test";
-		ProcessBuilder pb = new ProcessBuilder("apache-maven-3.5.0\\bin\\mvn.cmd", "test", "-Dtest=" + testClassName);
+		ProcessBuilder pb = new ProcessBuilder("C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test", "-Dtest=" + testClassName);
 		pb.redirectErrorStream(true);
 		pb.directory(new File("work\\commons-math"));
 		Process process = pb.start();
 		InputStream is = process.getInputStream();
-		try {
-			while(is.read() >= 0); //標準出力だけ読み込めばよい
-		} finally {
-			is.close();
-		}
-		process.waitFor();
+		printInputStream(is);
+		//process.waitFor();
 		String resultTest = "work\\commons-math\\target\\surefire-reports\\" + packageName + "." + className
 				+ "Test.txt";
 		BufferedReader br = new BufferedReader(new FileReader(resultTest));
