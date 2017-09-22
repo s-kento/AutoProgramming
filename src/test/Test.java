@@ -42,6 +42,7 @@ import org.apache.commons.codec.DecoderException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.text.edits.TextEdit;
+import org.junit.internal.TextListener;
 import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
@@ -54,8 +55,8 @@ import transformation.Transformation;
 public class Test {
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException, ParseException, DecoderException {
 		// test1();
-		// test6();
-		test7();
+		 test6();
+		//test7();
 		//test8();
 
 	}
@@ -179,11 +180,15 @@ public class Test {
 	public static void test6() throws ClassNotFoundException, MalformedURLException {
 		File file = new File(
 				"C:\\pleiades\\workspace\\AutoProgramming\\commons-text-1.0\\target\\commons-text-1.0-tests.jar");
+		File file2 = new File(
+				"C:\\pleiades\\workspace\\AutoProgramming\\commons-text-1.0\\target\\commons-text-1.0.jar");
 		URLClassLoader load;
-		load = URLClassLoader.newInstance(new URL[] { file.toURI().toURL() });
+		load = URLClassLoader.newInstance(new URL[] { file.toURI().toURL(),file2.toURI().toURL() });
 		Class cl = load.loadClass("org.apache.commons.text.StrLookupTest");
 		JUnitCore junit = new JUnitCore();
-		Result result = junit.run(Computer.serial(), cl);
+		//junit.main(cl.getName());
+		Result result =junit.runClasses(cl);
+		//Result result = junit.run(Computer.serial(), cl);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}

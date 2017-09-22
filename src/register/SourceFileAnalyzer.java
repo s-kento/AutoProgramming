@@ -47,7 +47,7 @@ public class SourceFileAnalyzer {
 				.collect(Collectors.toList());
 	}
 
-	/*
+	/**
 	 * fileListを返す
 	 *
 	 * @return fileList

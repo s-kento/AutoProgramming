@@ -43,7 +43,9 @@ public class Main {
 		String dependencies = "work\\commons-numbers-core-1.0-SNAPSHOT.jar;work\\commons-numbers-gamma-1.0-SNAPSHOT.jar;"
 				+ "work\\commons-numbers-angle-1.0-SNAPSHOT.jar;work\\commons-numbers-arrays-1.0-SNAPSHOT.jar;"
 				+ "work\\commons-rng-client-api-1.0.jar;work\\commons-rng-simple-1.0.jar;work\\commons-rng-sampling-1.1-SNAPSHOT.jar;"
-				+ "work\\jmh-core-1.13.jar;work\\jmh-generator-annprocess-1.13.jar;work\\junit-4.11.jar";
+				+ "work\\jmh-core-1.13.jar;work\\jmh-generator-annprocess-1.13.jar;work\\junit-4.11.jar;"
+				+ "work\\commons-numbers-fraction-1.0-SNAPSHOT.jar;work\\commons-rng-core-1.0.jar;work\\jopt-simple-4.6.jar;"
+				+ "work\\commons-math3-3.2.jar;work\\hamcrest-core-1.3.jar;work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar";
 		String[] targetArgs = { "-r", targetMethod.getReturnType(), "-p", targetMethod.getParameterType(), "-m",
 				targetMethod.getMethodName(), "-P", "commons-math" };
 		List<MethodInfo> evolvedMethods = search.execute(targetArgs);
@@ -94,6 +96,7 @@ public class Main {
 	 * @throws IOException
 	 */
 	public static void initialize() throws IOException {
+		System.out.println("initializing working directory...");
 		File dir = new File("work\\commons-math");
 		if (dir.exists())
 			FileUtils.deleteDirectory(dir);
@@ -103,6 +106,7 @@ public class Main {
 			if (file.getPath().endsWith(".java") || file.getPath().endsWith(".class"))
 				file.delete();
 		}
+		System.out.println("done initializing");
 	}
 
 	/**
@@ -143,12 +147,12 @@ public class Main {
 	 * テストクラスが存在するかどうか
 	 *
 	 * @param className
-	 * @param packageName
+	 * @param packagePath
 	 * @return exists
 	 */
-	public static boolean existsTestFile(String className, String packageName) {
+	public static boolean existsTestFile(String className, String packagePath) {
 		boolean exists = false;
-		File file = new File("work\\commons-math\\src\\test\\java\\" + packageName + "\\" + className + "Test.java");
+		File file = new File("work\\commons-math\\src\\test\\java\\" + packagePath + "\\" + className + "Test.java");
 		if (file.exists())
 			exists = true;
 		return exists;
@@ -166,13 +170,17 @@ public class Main {
 	public static boolean testFailed(String className, String packageName) throws IOException, InterruptedException {
 		boolean failed = false;
 		String testClassName = className + "Test";
-		ProcessBuilder pb = new ProcessBuilder("C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test", "-Dtest=" + testClassName);
+		ProcessBuilder pb = new ProcessBuilder(
+				"C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test",
+				"-Dtest=" + testClassName);
 		pb.redirectErrorStream(true);
 		pb.directory(new File("work\\commons-math"));
 		Process process = pb.start();
 		InputStream is = process.getInputStream();
+
 		printInputStream(is);
-		//process.waitFor();
+		process.waitFor();
+		process.destroy();
 		String resultTest = "work\\commons-math\\target\\surefire-reports\\" + packageName + "." + className
 				+ "Test.txt";
 		BufferedReader br = new BufferedReader(new FileReader(resultTest));
@@ -202,4 +210,5 @@ public class Main {
 			br.close();
 		}
 	}
+
 }
