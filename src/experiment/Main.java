@@ -7,7 +7,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,6 +19,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import org.junit.runner.notification.Failure;
 
 import search.MethodInfo;
 import search.Search;
@@ -166,34 +172,36 @@ public class Main {
 	 * @return failed
 	 * @throws IOException
 	 * @throws InterruptedException
+	 * @throws ClassNotFoundException
 	 */
-	public static boolean testFailed(String className, String packageName) throws IOException, InterruptedException {
+	public static boolean testFailed(String className, String packageName)
+			throws IOException, InterruptedException, ClassNotFoundException {
 		boolean failed = false;
-		String testClassName = className + "Test";
-		ProcessBuilder pb = new ProcessBuilder(
-				"C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test",
-				"-Dtest=" + testClassName);
-		pb.redirectErrorStream(true);
-		pb.directory(new File("work\\commons-math"));
-		Process process = pb.start();
-		InputStream is = process.getInputStream();
-
-		printInputStream(is);
-		process.waitFor();
-		process.destroy();
-		String resultTest = "work\\commons-math\\target\\surefire-reports\\" + packageName + "." + className
-				+ "Test.txt";
-		BufferedReader br = new BufferedReader(new FileReader(resultTest));
-		String line;
-		while ((line = br.readLine()) != null) {
-			Pattern p = Pattern.compile("FAILURE!");
-			Matcher m = p.matcher(line);
-			if (m.find()) {
-				failed = true;
-				break;
-			}
+		String[] classFileName = { "work\\commons-math\\target\\test-classes\\",
+				"work\\commons-math\\target\\classes", "work\\commons-math3-3.2.jar",
+				"work\\commons-numbers-angle-1.0-SNAPSHOT.jar", "work\\commons-numbers-arrays-1.0-SNAPSHOT.jar",
+				"work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar", "work\\commons-numbers-core-1.0-SNAPSHOT.jar",
+				"work\\commons-numbers-fraction-1.0-SNAPSHOT.jar", "work\\commons-numbers-gamma-1.0-SNAPSHOT.jar",
+				"work\\commons-rng-client-api-1.0.jar", "work\\commons-rng-core-1.0.jar",
+				"work\\commons-rng-sampling-1.1-SNAPSHOT.jar", "work\\commons-rng-simple-1.0.jar",
+				"work\\hamcrest-core-1.3.jar", "work\\jmh-core-1.13.jar", "work\\jmh-generator-annprocess-1.13.jar",
+				"work\\jopt-simple-4.6.jar", "work\\junit-4.11.jar" };
+		File[] classFiles = Arrays.stream(classFileName).map(File::new).toArray((e) -> new File[e]);
+		URL[] classFilesURL = new URL[classFiles.length];
+		for (int i = 0; i < classFiles.length; i++) {
+			classFilesURL[i]=classFiles[i].toURI().toURL();
 		}
-		br.close();
+		URLClassLoader load;
+		load = URLClassLoader.newInstance(classFilesURL);
+		Class cl = load.loadClass(packageName + "." + className+"Test");
+		JUnitCore junit = new JUnitCore();
+		Result result = junit.runClasses(cl);
+		// Result result = junit.run(Computer.serial(), cl);
+		List<Failure> failures = result.getFailures();
+		for(Failure failure:failures)
+			System.out.println(failure.toString());
+		if (failures.size() > 0)
+			failed = true;
 		return failed;
 	}
 

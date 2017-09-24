@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -53,11 +54,13 @@ import search.Search;
 import transformation.Transformation;
 
 public class Test {
-	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException, ParseException, DecoderException {
+	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException,
+			ParseException, DecoderException, InterruptedException {
 		// test1();
-		 test6();
-		//test7();
-		//test8();
+		//test6();
+		// test7();
+		// test8();
+		test9();
 
 	}
 
@@ -178,17 +181,30 @@ public class Test {
 	}
 
 	public static void test6() throws ClassNotFoundException, MalformedURLException {
-		File file = new File(
-				"C:\\pleiades\\workspace\\AutoProgramming\\commons-text-1.0\\target\\commons-text-1.0-tests.jar");
-		File file2 = new File(
-				"C:\\pleiades\\workspace\\AutoProgramming\\commons-text-1.0\\target\\commons-text-1.0.jar");
+		File testJarFile = new File(
+				"C:\\pleiades\\workspace\\AutoProgramming\\work\\commons-math\\target\\test-classes\\");
+		File srcJarFile = new File(
+				"C:\\pleiades\\workspace\\AutoProgramming\\work\\commons-math\\target\\commons-math4-4.0-SNAPSHOT.jar");
+		String[] dependences = { "work\\commons-math3-3.2.jar", "work\\commons-numbers-angle-1.0-SNAPSHOT.jar",
+				"work\\commons-numbers-arrays-1.0-SNAPSHOT.jar", "work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar",
+				"work\\commons-numbers-core-1.0-SNAPSHOT.jar", "work\\commons-numbers-fraction-1.0-SNAPSHOT.jar",
+				"work\\commons-numbers-gamma-1.0-SNAPSHOT.jar", "work\\commons-rng-client-api-1.0.jar", "work\\commons-rng-core-1.0.jar",
+				"work\\commons-rng-sampling-1.1-SNAPSHOT.jar", "work\\commons-rng-simple-1.0.jar", "work\\hamcrest-core-1.3.jar",
+				"work\\jmh-core-1.13.jar", "work\\jmh-generator-annprocess-1.13.jar", "work\\jopt-simple-4.6.jar", "work\\junit-4.11.jar" };
+		File[] files = Arrays.stream(dependences).map(File::new).toArray((e) -> new File[e]);
+		URL[] deps = new URL[files.length+2];
+		deps[0]=testJarFile.toURI().toURL();
+		deps[1]=srcJarFile.toURI().toURL();
 		URLClassLoader load;
-		load = URLClassLoader.newInstance(new URL[] { file.toURI().toURL(),file2.toURI().toURL() });
-		Class cl = load.loadClass("org.apache.commons.text.StrLookupTest");
+		for (int i = 2; i < files.length+2; i++) {
+			deps[i]=files[i-2].toURI().toURL();
+		}
+		load = URLClassLoader.newInstance(deps);
+		Class cl = load.loadClass("org.apache.commons.math4.analysis.differentiation.DerivativeStructureTest");
 		JUnitCore junit = new JUnitCore();
-		//junit.main(cl.getName());
-		Result result =junit.runClasses(cl);
-		//Result result = junit.run(Computer.serial(), cl);
+		// junit.main(cl.getName());
+		Result result = junit.runClasses(cl);
+		// Result result = junit.run(Computer.serial(), cl);
 		for (Failure failure : result.getFailures()) {
 			System.out.println(failure.toString());
 		}
@@ -201,7 +217,8 @@ public class Test {
 	public static void test7() throws IOException {
 
 		ProcessBuilder pb = new ProcessBuilder(
-				"C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test","-Dtest=DerivativeStructureTest");
+				"C:\\pleiades\\workspace\\AutoProgramming\\apache-maven-3.5.0\\bin\\mvn.cmd", "test",
+				"-Dtest=DerivativeStructureTest");
 		// ProcessBuilder pb = new ProcessBuilder("maven","test");
 		pb.redirectErrorStream(true);
 		pb.directory(new File("work\\commons-math"));
@@ -227,12 +244,20 @@ public class Test {
 	public static void test8()
 			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
 		Search search = new Search();
-		String[] args = { "-r", "java.lang.String", "-p", "int","-m","a" };
+		String[] args = { "-r", "java.lang.String", "-p", "int", "-m", "a" };
 		List<MethodInfo> methods = search.execute(args);
 		Transformation trans = new Transformation();
 		System.out.println(methods.get(0).getSourceCode());
 		System.out.println(methods.get(2).getSourceCode());
 		System.out.println(trans.replaceCode(methods.get(0), methods.get(2)));
 
+	}
+
+	public static void test9() throws InterruptedException{
+		TestThread t = new TestThread();
+		t.start();
+		t.join(5000);
+		t.stop();
+		System.out.println("スレッド破棄");
 	}
 }
