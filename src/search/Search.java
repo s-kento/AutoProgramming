@@ -29,8 +29,10 @@ public class Search {
 		CommandLine cl = conf.getOptions(args);
 		SQLite db = new SQLite(cl.getOptionValue("d"), cl.getOptionValue("t"));
 		List<MethodInfo> methods = db.getMethodInfo(cl);
-		Ranker rank = new Ranker();
-		methods = rank.sortByMethodNameSimilarity(cl.getOptionValue("m"), methods);
+//		Ranker rank = new Ranker();
+//		methods = rank.sortByMethodNameSimilarity(cl.getOptionValue("m"), methods);
+		Suggestion suggestion = new Suggestion();
+		methods = suggestion.suggest(cl.getOptionValue("m"), )
 		return methods;
 	}
 }

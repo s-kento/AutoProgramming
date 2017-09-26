@@ -1,143 +1,73 @@
 package suggestion;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import org.apache.commons.codec.DecoderException;
+import search.MethodInfo;
+import search.Ranker;
+import search.SQLite;
 
 import java.io.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * Created by matsumotojunnosuke on 2017/06/17.
  */
 class SuggestLogic {
 
-    final private int THREAD_NUM = 5;
-    private ExecutorService service;
-    private DataStore store;
-    private HashMap<String, Integer> cache = new HashMap<>();
-    private Boolean madeFileFlag = false;
+    private String methodName;
+    private String returnType;
+    private String parameterType;
+    private SQLite db;
 
-    SuggestLogic(DataStore store) {
-        this.store = store;
+    public SuggestLogic(String methodName, String parameterType, String returnType) {
+        this.methodName = methodName;
+        this.returnType = returnType;
+        this.parameterType = parameterType;
     }
 
-    void next() {
-        calculateLength(store.getNowMethod());
-        int maxLength = 0;
-        Method nextMethod = null;
-        for (Method method: store.getUncheckedMethods()) {
-            int length = 0;
-            for (Method m: store.getCheckedMethods()) {
-                length += getCache(method, m);
+    public List<MethodInfo> suggest() throws ClassNotFoundException, SQLException, IOException, DecoderException {
+        db = new SQLite(null,null);
+        List<MethodInfo> methods = db.getMethodInfo(parameterType, returnType);
+        List<MethodInfo> resultMethods = new ArrayList<>();
+        MethodInfo firstMethod = getFirstMethod(methods);
+        methods.remove(firstMethod);
+        resultMethods.add(firstMethod);
+        MethodInfo next = getNextMethodInfo(resultMethods, methods);
+        while (next != null) {
+            methods.remove(next);
+            resultMethods.add(next);
+        }
+        return resultMethods;
+    }
+
+    private MethodInfo getFirstMethod(List<MethodInfo> methods) {
+        MethodInfo firstMethod = methods.get(0);
+        Ranker ranker = new Ranker();
+        float leven = ranker.calcLeven(firstMethod.getMethodName(), methodName);
+        for (MethodInfo methodInfo: methods) {
+            float tmpLeven = ranker.calcLeven(methodInfo.getMethodName(), methodName);
+            if (tmpLeven > leven) {
+                leven = tmpLeven;
+                firstMethod = methodInfo;
             }
-            System.out.println(method.getId() + " length: " + length);
-            if (maxLength < length) {
+        }
+        return  firstMethod;
+    }
+
+    private MethodInfo getNextMethodInfo(List<MethodInfo> checkedMethods, List<MethodInfo> uncheckedMethods) throws ClassNotFoundException, SQLException, DecoderException, IOException {
+        Integer maxLength = 0;
+        MethodInfo nextMethod = null;
+        for (MethodInfo method: uncheckedMethods) {
+            Integer totalLength = 0;
+            for(MethodInfo checkedMethod: checkedMethods) {
+                totalLength += db.getLength(method, checkedMethod).getValue();
+            }
+            if (totalLength > maxLength) {
+                maxLength = totalLength;
                 nextMethod = method;
-                maxLength = length;
             }
         }
-        System.out.println("next: " + nextMethod.getId() + "\n");
-        store.next(nextMethod);
-    }
-
-    private void calculateLength(Method sourceMethod) {
-        class TMPFuture {
-            private Future<String> future;
-            private Method method;
-            private TMPFuture(Future<String> future, Method method) {
-                this.future = future;
-                this.method = method;
-            }
-        }
-        if (!madeFileFlag) makeJavaFiles();
-        service = Executors.newFixedThreadPool(THREAD_NUM);
-        List<TMPFuture> futureList = new ArrayList<>();
-        for (Method method: store.getAllMethods()) {
-            if (getCache(method, sourceMethod) != null) continue;
-            Future<String> future = executeGumtree(sourceMethod, method);
-            futureList.add(new TMPFuture(future, method));
-        }
-        service.shutdown();
-        try {
-            for (TMPFuture future: futureList) {
-                String text = future.future.get();
-                Method method = future.method;
-                JsonParser parser = new JsonParser();
-                JsonObject object = parser.parse(text).getAsJsonObject();
-                JsonArray array = object.getAsJsonArray("actions");
-                int length = array.size();
-                System.out.println("(" + sourceMethod.getId() + ", " + method.getId() + "): " + length);
-                setCache(method, sourceMethod, length);
-            }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Future<String> executeGumtree(Method a, Method b) {
-        String pathA = javaFilePath(a);
-        String pathB = javaFilePath(b);
-        CommandLine commandLine = new CommandLine();
-        commandLine.processBuilder = new ProcessBuilder(getGumtreePath(), "jsondiff", pathA, pathB);
-        Future<String> future = service.submit(commandLine);
-        return future;
-    }
-
-    private void makeJavaFiles() {
-        File newDir = new File("./tmp");
-        newDir.mkdir();
-        for (Method method: store.getAllMethods()) {
-            File newFile = new File(javaFilePath(method));
-            try {
-                newFile.createNewFile();
-                FileWriter writer = new FileWriter(newFile);
-                writer.write(getCompleteSourceCode(method));
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        madeFileFlag = true;
-    }
-
-    private String javaFilePath(Method method) {
-        return "./tmp/" + getClassName(method) + ".java";
-    }
-
-    private String getCompleteSourceCode(Method method) {
-        return "class " + getClassName(method) + " {\n" + method.getInfo().getSourceCode() + "\n}";
-    }
-
-    private String getClassName(Method method) {
-        return "Class" + method.getId();
-    }
-
-    private void setCache(Method a, Method b, int length) {
-        String key = getKey(a, b);
-        cache.put(key, length);
-    }
-
-    private Integer getCache(Method a, Method b) {
-        String key = getKey(a, b);
-        return cache.get(key);
-    }
-
-    private String getKey(Method a, Method b) {
-        int min = Math.min(a.getId(), b.getId());
-        int max = Math.max(a.getId(), b.getId());
-        return String.valueOf(min) + "-" + String.valueOf(max);
-    }
-
-    private String getGumtreePath() {
-        return "./gumtree/bin/gumtree";
+        return nextMethod;
     }
 }

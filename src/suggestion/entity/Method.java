@@ -1,4 +1,4 @@
-package suggestion;
+package suggestion.entity;
 
 import org.apache.commons.codec.DecoderException;
 import search.MethodInfo;
@@ -11,7 +11,7 @@ public class Method {
     private int id;
     private MethodInfo info;
 
-    Method(MethodInfo methodInfo, int id) throws DecoderException {
+    public Method(MethodInfo methodInfo, int id) throws DecoderException {
         info = methodInfo;
         this.id = id;
     }

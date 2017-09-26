@@ -65,7 +65,7 @@ Making Changes
   * A good topic branch name can be the JIRA bug id plus a keyword, e.g. `TEXT-123-InputStream`.
   * If you have submitted multiple JIRA issues, try to maintain separate branches and pull requests.
 + Make commits of logical units.
-  * Make sure your commit messages are meaningful and in the proper format. Your commit message should contain the key of the JIRA issue.
+  * Make sure your commit messages are meaningful and in the proper format. Your commit message should contain the id of the JIRA issue.
   * e.g. `TEXT-123: Close input stream earlier`
 + Respect the original code style:
   + Only use spaces for indentation.

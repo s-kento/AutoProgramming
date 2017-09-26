@@ -2,6 +2,9 @@ package search;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import register.MyVisitor;
+
+import java.util.Optional;
 
 /*
  * メソッド情報を持つクラス
@@ -16,7 +19,6 @@ public class MethodInfo {
 	private int startLine;
 	private String sourceCode;
 
-
 	public MethodInfo(String filePath, String className, String methodName, String returnType, String parameterType,
 			String projectName, int startLine, String sourceCode) throws DecoderException {
 		setFilePath(filePath);
@@ -27,6 +29,26 @@ public class MethodInfo {
 		setProjectName(projectName);
 		setStartLine(startLine);
 		setSourceCode(sourceCode);
+	}
+
+	public MethodInfo(MyVisitor visitor) throws DecoderException {
+		setFilePath(visitor.getFilePath());
+		setClassName(visitor.getClassName());
+		setMethodName(visitor.getMethodName());
+		setReturnType(visitor.getReturnType());
+		boolean seen = false;
+		String acc = null;
+		for (String s : visitor.getParameterType()) {
+			if (!seen) {
+				seen = true;
+				acc = s;
+			} else {
+				acc = acc + "," + s;
+			}
+		}
+		setParameterType((seen ? Optional.of(acc) : Optional.<String>empty()).get());
+		setStartLine(visitor.getStartLine());
+		setSourceCode(visitor.getSourceCode());
 	}
 
 	public String getFilePath() {
@@ -91,6 +113,10 @@ public class MethodInfo {
 
 	public void setSourceCode(String sourceCode) throws DecoderException {
 		this.sourceCode = toString(sourceCode);
+	}
+
+	public String getFQName() {
+		return getClassName() + "." + getMethodName();
 	}
 
 	public String toString(String hexstr) throws DecoderException{

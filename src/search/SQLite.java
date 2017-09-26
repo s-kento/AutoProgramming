@@ -14,6 +14,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.codec.DecoderException;
 
 import register.MyVisitor;
+import suggestion.Util;
+import suggestion.entity.Length;
 
 /*
  * DBに接続するクラス
@@ -25,6 +27,7 @@ public class SQLite {
 	Statement statement = null;
 	String db = "autoprog.db";
 	String table = "methods";
+	String lengthTableName = "lengths";
 
 	public SQLite(String db, String table) throws ClassNotFoundException, SQLException {// コンストラクタ
 		if (db != null)
@@ -146,5 +149,108 @@ public class SQLite {
 			e.printStackTrace();
 		}
 		return methods;
+	}
+
+	/*
+	 * クエリを満たすメソッド一覧を，MethodInfoクラスのリストとして返す
+	 *
+	 * @param cli クエリ
+	 *
+	 * @return methods MethodInfoクラスのリスト
+	 */
+	public List<MethodInfo> getMethodInfo(String parameterType, String returnType)
+			throws ClassNotFoundException, SQLException, IOException, DecoderException {
+		Class.forName("org.sqlite.JDBC");
+		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
+		statement = connection.createStatement();
+		String sql = "select * from " + table + " where 1=1" + " and parametertype=\'" + parameterType + "\' and returntype=\'" + returnType + "\'";
+		ResultSet rs = statement.executeQuery(sql);
+		List<MethodInfo> methods = new ArrayList<MethodInfo>();
+		while (rs.next()) {
+			MethodInfo method = new MethodInfo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
+					rs.getString(5), rs.getString(6), rs.getInt(7), rs.getString(8));
+			methods.add(method);
+		}
+
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return methods;
+	}
+
+	public void regist(MethodInfo methodA, MethodInfo methodB, Integer length) throws SQLException, ClassNotFoundException {
+		Class.forName("org.sqlite.JDBC");
+		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
+		statement = connection.createStatement();
+
+		String sql = "create table if not exists " + lengthTableName +
+				"(length numeric, id text, methodA text, methodB text)";
+		statement.executeUpdate(sql);
+		sql="create index if not exists signature on "+lengthTableName+"(id)";
+		statement.executeUpdate(sql);
+
+		String id = Util.getId(methodA, methodB);
+		sql = "insert into " + lengthTableName + " values(\'" + length + "\',\'" + id + "\',\'"
+				+ methodA.getFQName() + "\',\'" + methodB.getFQName() + "\')";
+		statement.executeUpdate(sql);
+
+		System.out.println(id + ": " + length.toString());
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public Length getLength(MethodInfo methodA, MethodInfo methodB) throws ClassNotFoundException, SQLException, IOException, DecoderException {
+		Class.forName("org.sqlite.JDBC");
+		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
+		statement = connection.createStatement();
+
+		String sql = "select * from " + lengthTableName + " where 1=1";
+		String key = Util.getId(methodA, methodB);
+		sql += " and key = " + key;
+
+		ResultSet rs = statement.executeQuery(sql);
+		Length length = null;
+		while (rs.next()) {
+			length = new Length(methodA, methodB, rs.getInt(1), key);
+		}
+
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return length;
 	}
 }

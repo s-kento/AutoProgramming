@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -15,7 +16,10 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
+import search.MethodInfo;
 import search.SQLite;
+import suggestion.Suggestion;
+import suggestion.entity.Method;
 
 /*
  * メソッドのシグネチャを取得するためのvisitor
@@ -144,12 +148,24 @@ public class MyVisitor extends ASTVisitor {
 
 			showMethodInfo(this); // メソッド情報を標準出力に表示
 
-			// メソッドをDBに格納するかどうかの検証はここでするのが良さそう
-
-			try {// メソッド情報をデータベースに登録
-				db.register(this);
-			} catch (ClassNotFoundException | SQLException e) {
+			// ここからメソッド間の距離の登録を行う
+			boolean flag = false;
+			try {
+				MethodInfo method = new MethodInfo(this);
+				Suggestion suggestion = new Suggestion();
+				flag = suggestion.regist(method);
+			} catch (DecoderException e) {
 				e.printStackTrace();
+			}
+			if (flag) {
+				try {// メソッド情報をデータベースに登録
+					db.register(this);
+					System.out.println(getMethodName() + "はDBに追加しました");
+				} catch (ClassNotFoundException | SQLException e) {
+					e.printStackTrace();
+				}
+			} else {
+				System.out.println(getMethodName() + "はDBに追加しません");
 			}
 		}
 		return true;
