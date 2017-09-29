@@ -19,9 +19,12 @@ public class Main {
 			Scanner scan = new Scanner(System.in);
 			String in = scan.next();
 			if(in.equals("register")){
+				long startTime = System.currentTimeMillis();
 				Register reg = new Register();
 				String arg = scan.nextLine();
 				reg.execute(arg.split("[\\s]+"));
+				long endTime = System.currentTimeMillis();
+				System.out.println((endTime - startTime) + "ms");
 			}else if(in.equals("search")){
 				Search search = new Search();
 				String arg = scan.nextLine();

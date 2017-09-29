@@ -30,7 +30,6 @@ public class RegistLogic {
     private Method targetMethod;
     private List<Method> methods;
     private SQLite db;
-    private boolean madeFileFlag = false;
 
     class TMPFuture {
         private Future<String> future;
@@ -50,6 +49,7 @@ public class RegistLogic {
             methods.add(new Method(methodInfo, i));
             i += 1;
         }
+        makeJavaFiles();
     }
 
     public Boolean regist() {
@@ -70,7 +70,6 @@ public class RegistLogic {
     }
 
     private List<Length> calculateLength() {
-        if (!madeFileFlag) makeJavaFiles();
         service = Executors.newFixedThreadPool(THREAD_NUM);
         List<TMPFuture> futureList = new ArrayList<>();
         for (Method method: methods) {
@@ -87,7 +86,8 @@ public class RegistLogic {
                 JsonObject object = parser.parse(text).getAsJsonObject();
                 JsonArray array = object.getAsJsonArray("actions");
                 int size = array.size();
-                if (size <= 60) {
+                if (size <= 40) {
+                    System.out.println(size);
                     return null;
                 }
                 Length length = new Length(method.getInfo(), targetMethod.getInfo(), size, Util.getId(method.getInfo(), targetMethod.getInfo()));
@@ -124,7 +124,15 @@ public class RegistLogic {
                 e.printStackTrace();
             }
         }
-        madeFileFlag = true;
+        File newFile = new File(javaFilePath(targetMethod));
+        try {
+            newFile.createNewFile();
+            FileWriter writer = new FileWriter(newFile);
+            writer.write(getCompleteSourceCode(targetMethod));
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String javaFilePath(Method method) {

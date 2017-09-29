@@ -161,11 +161,13 @@ public class MyVisitor extends ASTVisitor {
 				try {// メソッド情報をデータベースに登録
 					db.register(this);
 					System.out.println(getMethodName() + "はDBに追加しました");
+					System.out.println("\n");
 				} catch (ClassNotFoundException | SQLException e) {
 					e.printStackTrace();
 				}
 			} else {
 				System.out.println(getMethodName() + "はDBに追加しません");
+				System.out.println("\n");
 			}
 		}
 		return true;
@@ -188,7 +190,7 @@ public class MyVisitor extends ASTVisitor {
 				System.out.print(",");
 			}
 		}
-		System.out.println("\n");
+		System.out.print("\n");
 	}
 
 	/*

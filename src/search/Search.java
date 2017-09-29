@@ -32,7 +32,7 @@ public class Search {
 //		Ranker rank = new Ranker();
 //		methods = rank.sortByMethodNameSimilarity(cl.getOptionValue("m"), methods);
 		Suggestion suggestion = new Suggestion();
-		methods = suggestion.suggest(cl.getOptionValue("m"), )
+		methods = suggestion.suggest(cl.getOptionValue("m"),cl.getOptionValue("p"), cl.getOptionValue("r") );
 		return methods;
 	}
 }
