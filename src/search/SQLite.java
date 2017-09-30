@@ -67,13 +67,7 @@ public class SQLite {
 		/* SQL文の作成・ここから */
 		String sql = "insert into " + table + " values(\'" + visitor.getFilePath() + "\',\'" + visitor.getClassName() + "\',\'"
 				+ visitor.getMethodName() + "\',\'" + visitor.getReturnType() + "\',\'";
-		String params = "";
-		for (int i = 0; i < parameterType.size(); i++) {
-			params += parameterType.get(i);
-			if (i < parameterType.size() - 1) {
-				params += ",";
-			}
-		}
+		String params = Util.getParameter(parameterType.toArray(new String[parameterType.size()]));
 		sql += params + "\',\'" + visitor.getProjectName() + "\',\'" + visitor.getStartLine() + "\',\'"
 				+ visitor.getSourceCode() + "\')";
 		/* SQL文の作成・ここまで */
@@ -125,14 +119,7 @@ public class SQLite {
 		}
 		if (cl.hasOption("p")) {
 			sql += " and parametertype=\'";
-			String[] parameterType = cl.getOptionValues("p");
-			Arrays.sort(parameterType);
-			for (int i = 0; i < parameterType.length; i++) {
-				sql += parameterType[i];
-				if (i < parameterType.length - 1) {
-					sql += ",";
-				}
-			}
+			sql += Util.getParameter(cl.getOptionValues("p"));
 			sql += "\'";
 		}
 		/* SQL文の作成・ここまで */
@@ -176,7 +163,13 @@ public class SQLite {
 		Class.forName("org.sqlite.JDBC");
 		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
 		statement = connection.createStatement();
-		String sql = "select * from " + table + " where 1=1" + " and parametertype=\'" + parameterType + "\' and returntype=\'" + returnType + "\'";
+		String sql = "select * from " + table + " where 1=1";
+		if (parameterType != null) {
+			sql += " and parametertype=\'" + parameterType + "\'";
+		}
+		if (returnType != null) {
+			sql += " and returntype=\'" + returnType + "\'";
+		}
 		ResultSet rs = statement.executeQuery(sql);
 		List<MethodInfo> methods = new ArrayList<MethodInfo>();
 		while (rs.next()) {
@@ -235,13 +228,13 @@ public class SQLite {
 		statement = connection.createStatement();
 
 		String sql = "select * from " + lengthTableName + " where 1=1";
-		String key = Util.getId(methodA, methodB);
-		sql += " and key = " + key;
+		String id = Util.getId(methodA, methodB);
+		sql += " and id=\'" + id + "\'";
 
 		ResultSet rs = statement.executeQuery(sql);
 		Length length = null;
 		while (rs.next()) {
-			length = new Length(methodA, methodB, rs.getInt(1), key);
+			length = new Length(methodA, methodB, rs.getInt(1), id);
 		}
 
 		try {

@@ -29,6 +29,7 @@ class SuggestLogic {
 
     public List<MethodInfo> suggest() throws ClassNotFoundException, SQLException, IOException, DecoderException {
         List<MethodInfo> methods = db.getMethodInfo(parameterType, returnType);
+        if (parameterType == null || returnType == null || methods.isEmpty()) return methods;
         List<MethodInfo> resultMethods = new ArrayList<>();
         MethodInfo firstMethod = getFirstMethod(methods);
         methods.remove(firstMethod);
@@ -37,11 +38,13 @@ class SuggestLogic {
         while (next != null) {
             methods.remove(next);
             resultMethods.add(next);
+            next = getNextMethodInfo(resultMethods, methods);
         }
         return resultMethods;
     }
 
     private MethodInfo getFirstMethod(List<MethodInfo> methods) {
+        if (methodName == null) return methods.get(0);
         MethodInfo firstMethod = methods.get(0);
         Ranker ranker = new Ranker();
         float leven = ranker.calcLeven(firstMethod.getMethodName(), methodName);

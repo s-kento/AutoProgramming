@@ -9,6 +9,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
 import suggestion.Suggestion;
+import suggestion.Util;
 
 /*
  * データベースを参照するクラス
@@ -29,7 +30,7 @@ public class Search {
 		CommandLine cl = conf.getOptions(args);
 		SQLite db = new SQLite(cl.getOptionValue("d"), cl.getOptionValue("t"));
 		Suggestion suggestion = new Suggestion(db);
-		List<MethodInfo> methods = suggestion.suggest(cl.getOptionValue("m"),cl.getOptionValue("p"), cl.getOptionValue("r") );
+		List<MethodInfo> methods = suggestion.suggest(cl.getOptionValue("m"), Util.getParameter(cl.getOptionValues("p")), cl.getOptionValue("r"));
 		return methods;
 	}
 }
