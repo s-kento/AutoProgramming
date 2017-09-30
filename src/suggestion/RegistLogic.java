@@ -40,9 +40,9 @@ public class RegistLogic {
         }
     }
 
-    public RegistLogic(MethodInfo targetMethodInfo) throws DecoderException, SQLException, ClassNotFoundException, IOException {
+    public RegistLogic(MethodInfo targetMethodInfo, SQLite db) throws DecoderException, SQLException, ClassNotFoundException, IOException {
         this.targetMethod = new Method(targetMethodInfo, 0);
-        db = new SQLite(null, null);
+        this.db = db;
         methods = new ArrayList<Method>();
         int i = 1;
         for (MethodInfo methodInfo: db.getMethodInfo(targetMethodInfo.getParameterType(), targetMethodInfo.getReturnType())) {

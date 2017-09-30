@@ -152,7 +152,7 @@ public class MyVisitor extends ASTVisitor {
 			boolean flag = false;
 			try {
 				MethodInfo method = new MethodInfo(this);
-				Suggestion suggestion = new Suggestion();
+				Suggestion suggestion = new Suggestion(db);
 				flag = suggestion.regist(method);
 			} catch (DecoderException e) {
 				e.printStackTrace();

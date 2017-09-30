@@ -20,14 +20,14 @@ class SuggestLogic {
     private String parameterType;
     private SQLite db;
 
-    public SuggestLogic(String methodName, String parameterType, String returnType) {
+    public SuggestLogic(String methodName, String parameterType, String returnType, SQLite db) {
         this.methodName = methodName;
         this.returnType = returnType;
         this.parameterType = parameterType;
+        this.db = db;
     }
 
     public List<MethodInfo> suggest() throws ClassNotFoundException, SQLException, IOException, DecoderException {
-        db = new SQLite(null,null);
         List<MethodInfo> methods = db.getMethodInfo(parameterType, returnType);
         List<MethodInfo> resultMethods = new ArrayList<>();
         MethodInfo firstMethod = getFirstMethod(methods);

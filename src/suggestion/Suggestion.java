@@ -2,6 +2,7 @@ package suggestion;
 
 import org.apache.commons.codec.DecoderException;
 import search.MethodInfo;
+import search.SQLite;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -12,11 +13,15 @@ import java.util.List;
  */
 public class Suggestion {
 
-    public Suggestion() {}
+    private SQLite db;
+
+    public Suggestion(SQLite db) {
+        this.db = db;
+    }
 
     public boolean regist(MethodInfo targetMethodInfo) {
         try {
-            RegistLogic logic = new RegistLogic(targetMethodInfo);
+            RegistLogic logic = new RegistLogic(targetMethodInfo, db);
             return logic.regist();
         } catch (DecoderException e) {
             e.printStackTrace();
@@ -31,7 +36,7 @@ public class Suggestion {
     }
 
     public List<MethodInfo> suggest(String methodName, String parameterType, String returnType) {
-        SuggestLogic logic = new SuggestLogic(methodName, parameterType, returnType);
+        SuggestLogic logic = new SuggestLogic(methodName, parameterType, returnType, db);
         try {
             return logic.suggest();
         } catch (ClassNotFoundException e) {
