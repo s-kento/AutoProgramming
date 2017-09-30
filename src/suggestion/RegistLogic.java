@@ -114,21 +114,17 @@ public class RegistLogic {
         File newDir = new File("./tmp");
         newDir.mkdir();
         for (Method method: methods) {
-            File newFile = new File(javaFilePath(method));
-            try {
-                newFile.createNewFile();
-                FileWriter writer = new FileWriter(newFile);
-                writer.write(getCompleteSourceCode(method));
-                writer.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            makeJavaFile(method);
         }
-        File newFile = new File(javaFilePath(targetMethod));
+        makeJavaFile(targetMethod);
+    }
+
+    private void makeJavaFile(Method method) {
+        File newFile = new File(javaFilePath(method));
         try {
             newFile.createNewFile();
             FileWriter writer = new FileWriter(newFile);
-            writer.write(getCompleteSourceCode(targetMethod));
+            writer.write(getCompleteSourceCode(method));
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
