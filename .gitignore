@@ -1,11 +1,11 @@
 /bin/
-/test/
 /work/
 /tmp
-.classpath
 .settings
 *.db
 *.exe
+.gitignore
+./commons-text-1.0/
 
 # Astor
 /astor/*

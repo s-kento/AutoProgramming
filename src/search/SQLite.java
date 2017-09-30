@@ -128,6 +128,9 @@ public class SQLite {
 		if (cl.hasOption("r")) {
 			sql += " and returntype=\'" + cl.getOptionValue("r") + "\'";
 		}
+		if (cl.hasOption("P")) {
+			sql += " and projectname=\'" + cl.getOptionValue("P") + "\'";
+		}
 		if (cl.hasOption("p")) {
 			sql += " and parametertype=\'";
 			String[] parameterType = cl.getOptionValues("p");

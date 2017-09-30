@@ -1,5 +1,6 @@
 package register;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -22,7 +23,7 @@ public class Register {
 	public void execute(String[] args) throws ClassNotFoundException, SQLException, IOException, ParseException {
 		Config conf = new Config();
 		CommandLine cl = conf.getOptions(args);
-		SourceFileAnalyzer sfa = new SourceFileAnalyzer(cl.getOptionValue("f"));
+		SourceFileAnalyzer sfa = new SourceFileAnalyzer(new File(cl.getOptionValue("f")));
 		System.out.println("ファイル格納完了");
 		for (String filePath : sfa.getFileList()) {
 			System.out.println(filePath);

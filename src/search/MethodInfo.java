@@ -124,4 +124,15 @@ public class MethodInfo {
 		String str = new String(sbyte);
 		return str;
 	}
+
+	public boolean equals(MethodInfo method){
+		boolean equal = false;
+		if(getFilePath().equals(method.getFilePath()) && getStartLine()==method.getStartLine())
+			equal=true;
+		return equal;
+	}
+
+	public int hashCode(){
+		return getFilePath().hashCode()+getStartLine();
+	}
 }

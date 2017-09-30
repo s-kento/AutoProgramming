@@ -23,6 +23,9 @@ public class Ranker {
 	 * @return ソート済みのMethodInfoリスト
 	 */
 	public List<MethodInfo> sortByMethodNameSimilarity(String methodName, List<MethodInfo> methods){
+		if(methodName==null)
+			return methods;
+
 		List<MethodInfo> sortedMethods = new ArrayList<MethodInfo>();
 		Map<MethodInfo, Float> distance = new HashMap<MethodInfo, Float>();
 		for(MethodInfo method:methods){

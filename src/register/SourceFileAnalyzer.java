@@ -3,6 +3,7 @@ package register;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-/*
+/**
  * ソースファイルの解析をするクラス
  * @author s-kento
  */
@@ -24,29 +25,29 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 public class SourceFileAnalyzer {
 	private List<String> fileList = new ArrayList<String>(); // ターゲットファイル群．ファイルの絶対パスを格納
 
-	SourceFileAnalyzer(String file) { // コンストラクタ
-		setFileList(new File(file));
+	public SourceFileAnalyzer(File file) throws IOException { // コンストラクタ
+		setFileList(file);
+	}
+	public SourceFileAnalyzer(){
+
 	}
 
-	/*
+
+	/**
 	 * 指定したディレクトリ下のファイル名(絶対パス)をfileList変数に格納する
 	 *
 	 * @param file ターゲットディレクトリ
+	 * @throws IOException
 	 */
-	public void setFileList(File file) {
-		if (file.isDirectory()) {
-			File[] innerFiles = file.listFiles();
-			for (File tmp : innerFiles) {
-				setFileList(tmp);
-			}
-		} else if (file.isFile()) {
-			if (file.getName().endsWith(".java")) {
-				fileList.add(file.getAbsolutePath());
-			}
-		}
+	public void setFileList(File file) throws IOException {
+		this.fileList =  Files.walk(file.toPath())
+				.filter(e -> !Files.isDirectory(e))
+				.filter(e -> e.toString().endsWith(".java"))
+				.map(e -> e.toString())
+				.collect(Collectors.toList());
 	}
 
-	/*
+	/**
 	 * fileListを返す
 	 *
 	 * @return fileList
@@ -55,7 +56,7 @@ public class SourceFileAnalyzer {
 		return fileList;
 	}
 
-	/*
+	/**
 	 * ソースコードのASTを返す
 	 *
 	 * @param filePath ファイルの絶対パス
@@ -63,7 +64,7 @@ public class SourceFileAnalyzer {
 	 * @return CompolationUnit ソースコードのAST
 	 */
 	public CompilationUnit getAST(String filePath) throws IOException {
-		String source = Files.lines(Paths.get(filePath), Charset.forName("UTF-8"))
+		String source = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 		ASTParser parser = ASTParser.newParser(AST.JLS8);
 		parser.setBindingsRecovery(true);
@@ -76,6 +77,7 @@ public class SourceFileAnalyzer {
 		parser.setSource(source.toCharArray());
 		parser.setUnitName("Target.java");
 		CompilationUnit unit = (CompilationUnit) parser.createAST(new NullProgressMonitor());
+		unit.recordModifications();
 		/*String source = Files.lines(Paths.get(filePath), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 		ASTParser parser = ASTParser.newParser(AST.JLS4);

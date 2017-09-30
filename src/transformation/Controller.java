@@ -24,7 +24,7 @@ import javax.tools.ToolProvider;
  * メソッド書き換えやリコンパイル，メソッド実行を担当するクラス
  */
 public class Controller {
-	/*
+	/**
 	 * jarファイルから指定したjavaファイルを抽出する
 	 *
 	 * @param fileName 抽出したいJavaファイル
@@ -38,7 +38,7 @@ public class Controller {
 		}
 	}
 
-	/*
+	/**
 	 * jarファイルからエントリを抽出し，文字列として読み込んで新規ファイルに書き込む
 	 *
 	 * @param zipFile jarファイル
@@ -69,24 +69,25 @@ public class Controller {
 		pw.close();
 	}
 
-	/*
+	/**
 	 * 書き換えたメソッドを含むjavaファイルをコンパイルし，クラスファイルを生成する
 	 *
-	 * @param zipFile jarファイル
+	 * @param jarFileName プロジェクトのjarファイル名
 	 *
-	 * @param name 抽出したいJavaファイル
+	 * @param javaFileName コンパイルしたいJavaファイル名
+	 *
+	 * @return r 0ならコンパイル成功
 	 */
-	public void compile(String jarFileName, String javaFileName) {
+	public int compile(String jarFileName, String javaFileName) {
 		File src = new File("work\\" + javaFileName);
-		String[] args = { "-classpath", "C:\\pleiades\\workspace\\AutoProgramming\\work\\" + jarFileName,
+		String[] args = { "-classpath", jarFileName,
 				src.getAbsolutePath() };
 		JavaCompiler c = ToolProvider.getSystemJavaCompiler();
 		int r = c.run(null, null, null, args);
-		if (r != 0)
-			throw new RuntimeException("コンパイル失敗:" + r);
+		return r;
 	}
 
-	/*
+	/**
 	 * メソッドを実行する
 	 * @param jarFileName jarファイル名
 	 * @param javaFileName javaファイル名
@@ -117,7 +118,7 @@ public class Controller {
 		return r;
 	}
 
-	/*
+	/**
 	 * カンマ区切りの型名から，Classクラスの配列を返す
 	 * @param parameterTypes 引数の型，カンマ区切り
 	 * @return classes Classクラスの配列
@@ -137,7 +138,7 @@ public class Controller {
 		return classes;
 	}
 
-	/*
+	/**
 	 * ファイル名に.jarがついてなければつける
 	 * @param original jarファイル名
 	 * @return adjusted 拡張子付きのファイル名
