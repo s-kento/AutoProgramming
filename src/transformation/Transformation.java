@@ -29,32 +29,39 @@ public class Transformation {
 
 	public void execute(String[] args) throws Exception {
 		GenProg gen = new GenProg();
-		/*String[] arguments = { "-location", "./commons-text-1.0", "-mode", "jgenprog", "-scope", "global", "-failing",
-				"org.apache.commons.text.StrBuilderTest", "-srcjavafolder", "/src/main/java/", "-srctestfolder",
-				"/src/test/", "-binjavafolder", "/target/classes", "-bintestfolder", "/target/test-classes",
-				"-flthreshold", "0.5", "-seed", "4", "-maxtime", "100", "-stopfirst", "true", "-dependencies",
-				"./commons-text-1.0/lib/hamcrest-all-1.3.jar:./commons-text-1.0/lib/hamcrest-core-1.3.jar;./commons-text-1.0/lib/junit-4.12.jar;./commons-text-1.0/lib/commons-lang3.jar" };*/
+		/*
+		 * String[] arguments = { "-location", "./commons-text-1.0", "-mode",
+		 * "jgenprog", "-scope", "global", "-failing",
+		 * "org.apache.commons.text.StrBuilderTest", "-srcjavafolder",
+		 * "/src/main/java/", "-srctestfolder", "/src/test/", "-binjavafolder",
+		 * "/target/classes", "-bintestfolder", "/target/test-classes",
+		 * "-flthreshold", "0.5", "-seed", "4", "-maxtime", "100", "-stopfirst",
+		 * "true", "-dependencies",
+		 * "./commons-text-1.0/lib/hamcrest-all-1.3.jar:./commons-text-1.0/lib/hamcrest-core-1.3.jar;./commons-text-1.0/lib/junit-4.12.jar;./commons-text-1.0/lib/commons-lang3.jar"
+		 * };
+		 */
 		gen.execute(args);
 	}
 
 	/**
 	 * メソッドAのコードをメソッドBのコードに置き換える
 	 *
-	 * @param methodA 書き換え先
-	 * @param methodB 書き換え元
+	 * @param methodA
+	 *            書き換え先
+	 * @param methodB
+	 *            書き換え元
 	 * @return replacedSourceCode 書き換え後のソースコード全体
 	 */
 	public String replaceCode(MethodInfo methodA, MethodInfo methodB) throws IOException {
 		SourceFileAnalyzer sfa = new SourceFileAnalyzer();
 		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
 		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
-		/*String packageA = unitA.getPackage().toString();//import文の追加
-		String packageB = unitB.getPackage().toString();
-		if (!packageA.equals(packageB)) {
-			if (!existsImport(unitA, methodB)) {
-				addImport(unitA, methodA, methodB);
-			}
-		}*/
+		/*
+		 * String packageA = unitA.getPackage().toString();//import文の追加 String
+		 * packageB = unitB.getPackage().toString(); if
+		 * (!packageA.equals(packageB)) { if (!existsImport(unitA, methodB)) {
+		 * addImport(unitA, methodA, methodB); } }
+		 */
 		ReplaceVisitor visitorA = new ReplaceVisitor(unitA, methodA);
 		visitorA.doReplace();
 		ReplaceVisitor visitorB = new ReplaceVisitor(unitB, methodB);
@@ -64,7 +71,26 @@ public class Transformation {
 		ASTRewrite rewriter = visitorA.getRewriter();
 		String source = Files.lines(Paths.get(methodA.getFilePath()), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
-		String replacedSourceCode=getCode(source, rewriter);
+		String replacedSourceCode = getCode(source, rewriter);
+
+		return replacedSourceCode;
+	}
+
+	/**
+	 * メソッドAのコードを，メソッドBを含むクラスに移植する
+	 *
+	 * @param methodA
+	 *            書き換え先
+	 * @param methodB
+	 *            書き換え元
+	 * @return replacedSourceCode 書き換え後のソースコード全体
+	 * @throws IOException
+	 */
+	public String replaceCode2(MethodInfo methodA, MethodInfo methodB) throws IOException {
+		String replacedSourceCode = null;
+		SourceFileAnalyzer sfa = new SourceFileAnalyzer();
+		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
+		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
 
 		return replacedSourceCode;
 	}
@@ -107,6 +133,6 @@ public class Transformation {
 		ImportDeclaration id = ast.newImportDeclaration();
 		id.setName(ast.newName(methodB.getClassName()));
 		unit.imports().add(id);
-		unit.rewrite(doc, null);//うまくいかない
+		unit.rewrite(doc, null);// うまくいかない
 	}
 }

@@ -34,3 +34,7 @@ org.apache.commons.text.StrBuilderTest
 -bintestfolder /target/test-classes
 -flthreshold 0.5 -seed 4 -maxtime 100 -stopfirst true
 -dependencies ./commons-text-1.0/lib/hamcrest-all-1.3.jar:./commons-text-1.0/lib/hamcrest-core-1.3.jar;./commons-text-1.0/lib/junit-4.12.jar;./commons-text-1.0/lib/commons-lang3.jar
+
+
+Suspicious Code
+className=org.apache.commons.text.StrBuilder, methodName=org.apache.commons.text.StrBuilder{endsWith(Ljava/lang/String;)Z 0.0, lineNumber=2182, susp=1.0
