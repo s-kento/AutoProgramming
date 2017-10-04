@@ -92,6 +92,9 @@ public class Transformation {
 		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
 		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
 
+		ReplaceVisitor2 visitorA = new ReplaceVisitor2(unitB, methodA, methodB);
+		unitB.accept(visitorA);
+		unitA.accept(visitorA);
 		return replacedSourceCode;
 	}
 
