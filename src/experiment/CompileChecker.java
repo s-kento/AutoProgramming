@@ -31,7 +31,7 @@ public class CompileChecker {
 				+ "work\\commons-math3-3.2.jar;work\\hamcrest-core-1.3.jar;work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar";
 		File file = new File("CompileCheck.txt");
 		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-		pw.println("FilePath, MethodName, startLine, Compilable Code Number");
+		pw.println("FilePath, MethodName, startLine, Candidate Number, Compilable Code Number");
 		int ccn;
 		for (MethodInfo targetMethod : methods) {
 			ccn = 0;
@@ -60,7 +60,7 @@ public class CompileChecker {
 			}
 
 			pw.println(targetMethod.getFilePath() + ", " + targetMethod.getMethodName() + ", "
-					+ targetMethod.getStartLine() + ", "+ccn);
+					+ targetMethod.getStartLine() + ", "+evolvedMethods.size()+", "+ccn);
 		}
 		pw.close();
 	}

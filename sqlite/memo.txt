@@ -29,3 +29,7 @@ delete from [テーブル名];
 再帰的にUTF8にするコマンド
 →find . -name *.java | xargs -n 10 nkf -w --overwrite
 参考サイト：http://blog.6vox.com/2014/03/nkf.html
+
+6347メソッドで10MB
+
+
