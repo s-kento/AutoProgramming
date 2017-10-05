@@ -92,9 +92,43 @@ public class Transformation {
 		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
 		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
 
-		ReplaceVisitor2 visitorA = new ReplaceVisitor2(unitB, methodA, methodB);
-		unitB.accept(visitorA);
-		unitA.accept(visitorA);
+		ReplaceVisitor2 visitor = new ReplaceVisitor2(unitB, methodA, methodB);
+		unitB.accept(visitor);
+		unitA.accept(visitor);
+		ASTRewrite rewriter=visitor.getRewriter();
+		String source = Files.lines(Paths.get(methodB.getFilePath()), Charset.forName("UTF-8"))
+				.collect(Collectors.joining(System.getProperty("line.separator")));
+		replacedSourceCode = getCode(source, rewriter);
+
+
+		return replacedSourceCode;
+	}
+
+	/**
+	 * メソッドAのコードを，メソッドBを含むクラスに移植する
+	 *
+	 * @param methodA
+	 *            書き換え先
+	 * @param methodB
+	 *            書き換え元
+	 * @return replacedSourceCode 書き換え後のソースコード全体
+	 * @throws IOException
+	 */
+	public String replaceCode3(MethodInfo methodA, MethodInfo methodB) throws IOException {
+		String replacedSourceCode = null;
+		SourceFileAnalyzer sfa = new SourceFileAnalyzer();
+		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
+		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
+
+		ReplaceVisitor3 visitor = new ReplaceVisitor3(unitA, methodA, methodB);
+		unitA.accept(visitor);
+		unitB.accept(visitor);
+		ASTRewrite rewriter=visitor.getRewriter();
+		String source = Files.lines(Paths.get(methodA.getFilePath()), Charset.forName("UTF-8"))
+				.collect(Collectors.joining(System.getProperty("line.separator")));
+		replacedSourceCode = getCode(source, rewriter);
+
+
 		return replacedSourceCode;
 	}
 

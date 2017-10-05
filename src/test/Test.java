@@ -56,11 +56,7 @@ import transformation.Transformation;
 public class Test {
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException,
 			ParseException, DecoderException, InterruptedException {
-		// test1();
-		//test6();
-		// test7();
-		// test8();
-		test9();
+		test10(args);
 
 	}
 
@@ -188,16 +184,17 @@ public class Test {
 		String[] dependences = { "work\\commons-math3-3.2.jar", "work\\commons-numbers-angle-1.0-SNAPSHOT.jar",
 				"work\\commons-numbers-arrays-1.0-SNAPSHOT.jar", "work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar",
 				"work\\commons-numbers-core-1.0-SNAPSHOT.jar", "work\\commons-numbers-fraction-1.0-SNAPSHOT.jar",
-				"work\\commons-numbers-gamma-1.0-SNAPSHOT.jar", "work\\commons-rng-client-api-1.0.jar", "work\\commons-rng-core-1.0.jar",
-				"work\\commons-rng-sampling-1.1-SNAPSHOT.jar", "work\\commons-rng-simple-1.0.jar", "work\\hamcrest-core-1.3.jar",
-				"work\\jmh-core-1.13.jar", "work\\jmh-generator-annprocess-1.13.jar", "work\\jopt-simple-4.6.jar", "work\\junit-4.11.jar" };
+				"work\\commons-numbers-gamma-1.0-SNAPSHOT.jar", "work\\commons-rng-client-api-1.0.jar",
+				"work\\commons-rng-core-1.0.jar", "work\\commons-rng-sampling-1.1-SNAPSHOT.jar",
+				"work\\commons-rng-simple-1.0.jar", "work\\hamcrest-core-1.3.jar", "work\\jmh-core-1.13.jar",
+				"work\\jmh-generator-annprocess-1.13.jar", "work\\jopt-simple-4.6.jar", "work\\junit-4.11.jar" };
 		File[] files = Arrays.stream(dependences).map(File::new).toArray((e) -> new File[e]);
-		URL[] deps = new URL[files.length+2];
-		deps[0]=testJarFile.toURI().toURL();
-		deps[1]=srcJarFile.toURI().toURL();
+		URL[] deps = new URL[files.length + 2];
+		deps[0] = testJarFile.toURI().toURL();
+		deps[1] = srcJarFile.toURI().toURL();
 		URLClassLoader load;
-		for (int i = 2; i < files.length+2; i++) {
-			deps[i]=files[i-2].toURI().toURL();
+		for (int i = 2; i < files.length + 2; i++) {
+			deps[i] = files[i - 2].toURI().toURL();
 		}
 		load = URLClassLoader.newInstance(deps);
 		Class cl = load.loadClass("org.apache.commons.math4.analysis.differentiation.DerivativeStructureTest");
@@ -253,11 +250,31 @@ public class Test {
 
 	}
 
-	public static void test9() throws InterruptedException{
+	public static void test9() throws InterruptedException {
 		TestThread t = new TestThread();
 		t.start();
 		t.join(5000);
 		t.stop();
 		System.out.println("スレッド破棄");
+	}
+
+	public static void test10(String args[])
+			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
+		Search search = new Search();
+		List<MethodInfo> methods = search.execute(args);
+		MethodInfo targetMethod = methods.get(0);
+		String[] argument = { "-r", targetMethod.getReturnType(), "-p", targetMethod.getParameterType(), "-m",
+				targetMethod.getMethodName(), "-P", "commons-math" };
+		List<MethodInfo> evolvedMethods = search.execute(argument);
+		for (MethodInfo targetEvolvedMethod : evolvedMethods) {
+			if (targetMethod.getClassName().equals(targetEvolvedMethod.getClassName())
+					|| targetMethod.getMethodName().equals(targetEvolvedMethod.getMethodName())) {
+				continue;
+			}
+			Transformation trans = new Transformation();
+			System.out.println(
+					"target: " + targetMethod.getMethodName() + ", evolved: " + targetEvolvedMethod.getMethodName());
+			System.out.println(trans.replaceCode3(targetMethod, targetEvolvedMethod));
+		}
 	}
 }

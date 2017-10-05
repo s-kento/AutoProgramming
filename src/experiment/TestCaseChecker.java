@@ -56,8 +56,8 @@ public class TestCaseChecker {
 			testcase.setSigNumber(evolvedMethods.size() - 1);
 			if (!Main.existsTestFile(getClassName(targetMethod), Main.toDirectoryName(targetMethod.getClassName()))
 					|| testcase.getSigNumber() == 0) {
-					writeTestCaseInfo(testcase, pw);
-					continue;
+				writeTestCaseInfo(testcase, pw);
+				continue;
 			} else {// テストケースが存在，かつ同じシグネチャのメソッドが1つ以上存在すれば
 				Transformation trans = new Transformation();
 				Controller ctr = new Controller();
@@ -87,10 +87,11 @@ public class TestCaseChecker {
 							FileUtils.moveFileToDirectory(new File("work\\" + targetClassFileName), dstclassDir, false);
 						}
 
-						TestCaseRunnerThread th = new TestCaseRunnerThread(targetClassName,Main.toPackageName(targetAbsClassName),testcase);
+						TestCaseRunnerThread th = new TestCaseRunnerThread(targetClassName,
+								Main.toPackageName(targetAbsClassName), testcase);
 						th.start();
 						th.join(60000);
-						if(th.isAlive()){
+						if (th.isAlive()) {
 							th.stop();
 						}
 
