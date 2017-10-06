@@ -11,10 +11,12 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
 
+import experiment.TestCaseChecker;
 import register.SourceFileAnalyzer;
 import search.MethodInfo;
 
@@ -92,11 +94,10 @@ public class Transformation {
 		ReplaceVisitor2 visitor = new ReplaceVisitor2(unitB, methodA, methodB);
 		unitB.accept(visitor);
 		unitA.accept(visitor);
-		ASTRewrite rewriter=visitor.getRewriter();
+		ASTRewrite rewriter = visitor.getRewriter();
 		String source = Files.lines(Paths.get(methodB.getFilePath()), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 		replacedSourceCode = getCode(source, rewriter);
-
 
 		return replacedSourceCode;
 	}
@@ -119,12 +120,15 @@ public class Transformation {
 
 		ReplaceVisitor3 visitor = new ReplaceVisitor3(unitA, unitB, methodA, methodB);
 		unitA.accept(visitor);
+		visitor.firstSearch = false;
 		unitB.accept(visitor);
-		ASTRewrite rewriter=visitor.getRewriter();
+		ASTRewrite rewriter = visitor.getRewriter();
+		if (!methodA.getClassName().equals(methodB.getClassName())) {
+			addImport(unitA, unitB, methodA, methodB, rewriter);
+		}
 		String source = Files.lines(Paths.get(methodA.getFilePath()), Charset.forName("UTF-8"))
 				.collect(Collectors.joining(System.getProperty("line.separator")));
 		replacedSourceCode = getCode(source, rewriter);
-
 
 		return replacedSourceCode;
 	}
@@ -160,13 +164,39 @@ public class Transformation {
 		return exist;
 	}
 
-	public void addImport(CompilationUnit unit, MethodInfo methodA, MethodInfo methodB) throws IOException {
-		Document doc = new Document(Files.lines(Paths.get(methodA.getFilePath()), Charset.forName("UTF-8"))
-				.collect(Collectors.joining(System.getProperty("line.separator"))));
-		AST ast = unit.getAST();
-		ImportDeclaration id = ast.newImportDeclaration();
-		id.setName(ast.newName(methodB.getClassName()));
-		unit.imports().add(id);
-		unit.rewrite(doc, null);// うまくいかない
+	public void addImport(CompilationUnit unitA, CompilationUnit unitB, MethodInfo methodA, MethodInfo methodB, ASTRewrite rewriter)
+			throws IOException {
+		AST astA = unitA.getAST();
+		ListRewrite lrw = rewriter.getListRewrite(unitA, unitA.IMPORTS_PROPERTY);
+		List<ImportDeclaration> idA = unitA.imports();
+		List<ImportDeclaration> idB = unitB.imports();
+		for (ImportDeclaration id : idB) {
+			if (!containsIDNode(idA, id)) {
+				lrw.insertLast(id, null);
+			}
+		}
+
+		String packageA = TestCaseChecker.getPackageName(methodA);
+		String packageB = TestCaseChecker.getPackageName(methodB);
+		if (!packageA.equals(packageB)) {
+			ImportDeclaration id = astA.newImportDeclaration();
+			id.setName(astA.newName(methodB.getClassName()));
+			if(!containsIDNode(idA, id)){
+				lrw.insertLast(id, null);
+			}
+		}
+
 	}
+
+	public boolean containsIDNode(List<ImportDeclaration> idList, ImportDeclaration targetId) {
+		boolean contain = false;
+		for(ImportDeclaration id : idList){
+			if(id.getName().toString().equals(targetId.getName().toString())){
+				contain=true;
+				break;
+			}
+		}
+		return contain;
+	}
+
 }

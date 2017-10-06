@@ -5,7 +5,9 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
@@ -98,11 +100,13 @@ public class ReplaceVisitor3 extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
+		if(node.isConstructor())
+			return false;
+
 		if (firstSearch) {// methodAクラスの探索
 			if (node.getName().toString().equals(methodA.getMethodName())) {
 				setMethodANode(node);
 				setParent(getParentTypeDeclaration(node));
-				firstSearch = false;
 			}
 		} else {// methodBクラスの探索
 			if (node.getName().toString().equals(methodB.getMethodName())) {// methodBなら，メソッド名をmethodAに変更してnodeをreplace
@@ -127,6 +131,16 @@ public class ReplaceVisitor3 extends ASTVisitor {
 		}
 		return true;
 	}
+
+/*	@Override
+	public boolean visit(SimpleName node){
+		IBinding ib = node.resolveBinding();
+		if(ib.getKind()==IBinding.VARIABLE)
+			System.out.println(ib.getKey());
+
+		return true;
+	}*/
+
 
 	public TypeDeclaration getParentTypeDeclaration(ASTNode node) {
 		ASTNode parent = (ASTNode) node;

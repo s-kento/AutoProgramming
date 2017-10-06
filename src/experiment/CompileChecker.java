@@ -44,7 +44,11 @@ public class CompileChecker {
 			for (MethodInfo evMethod : evolvedMethods) {
 				if (targetMethod.equals(evMethod))
 					continue;
-				String replacedCode = trans.replaceCode(targetMethod, evMethod);
+				String replacedCode;
+				if(targetMethod.getClassName().equals(evMethod.getClassName()))
+					replacedCode = trans.replaceCode(targetMethod, evMethod);
+				else
+					replacedCode = trans.replaceCode3(targetMethod, evMethod);
 				File targetJavaFile = new File("work\\" + targetJavaFileName);
 				FileWriter filewriter = new FileWriter(targetJavaFile);
 				filewriter.write(replacedCode);

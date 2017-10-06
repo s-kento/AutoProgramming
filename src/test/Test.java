@@ -40,7 +40,6 @@ public class Test {
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException,
 			ParseException, DecoderException, InterruptedException {
 		test10(args);
-
 	}
 
 	/*
@@ -261,4 +260,5 @@ public class Test {
 			break;
 		}
 	}
+
 }
