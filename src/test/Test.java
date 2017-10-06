@@ -9,29 +9,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.Charset;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -40,11 +28,6 @@ import javax.tools.ToolProvider;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
-import org.eclipse.text.edits.TextEdit;
-import org.junit.internal.TextListener;
-import org.junit.runner.Computer;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -273,8 +256,9 @@ public class Test {
 			}
 			Transformation trans = new Transformation();
 			System.out.println(
-					"target: " + targetMethod.getMethodName() + ", evolved: " + targetEvolvedMethod.getMethodName());
+					"target: " + targetMethod.getClassName()+"."+targetMethod.getMethodName() + ", evolved: "+targetEvolvedMethod.getClassName()+"." + targetEvolvedMethod.getMethodName());
 			System.out.println(trans.replaceCode3(targetMethod, targetEvolvedMethod));
+			break;
 		}
 	}
 }

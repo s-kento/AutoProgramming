@@ -14,7 +14,8 @@ import org.eclipse.text.edits.TextEditGroup;
 import search.MethodInfo;
 
 public class ReplaceVisitor3 extends ASTVisitor {
-	private CompilationUnit unitA;// メソッドBを含むクラスのAST
+	private CompilationUnit unitA;// メソッドAを含むクラスのAST
+	private CompilationUnit unitB;
 	private MethodInfo methodA;
 	private MethodInfo methodB;
 	private MethodDeclaration methodANode;// method declaration
@@ -26,8 +27,9 @@ public class ReplaceVisitor3 extends ASTVisitor {
 
 	private TextEditGroup editGroup = new TextEditGroup("Replacing nodes");
 
-	public ReplaceVisitor3(CompilationUnit unitA, MethodInfo methodA, MethodInfo methodB) {
-		setUnit(unitA);
+	public ReplaceVisitor3(CompilationUnit unitA, CompilationUnit unitB, MethodInfo methodA, MethodInfo methodB) {
+		setUnitA(unitA);
+		setUnitB(unitB);
 		setMethodA(methodA);
 		setMethodB(methodB);
 		ast = unitA.getAST();
@@ -50,12 +52,20 @@ public class ReplaceVisitor3 extends ASTVisitor {
 		this.methodB = methodB;
 	}
 
-	public CompilationUnit getUnit() {
+	public CompilationUnit getUnitB() {
+		return unitB;
+	}
+
+	public void setUnitB(CompilationUnit unitB) {
+		this.unitB = unitB;
+	}
+
+	public CompilationUnit getUnitA() {
 		return unitA;
 	}
 
-	public void setUnit(CompilationUnit unit) {
-		this.unitA = unit;
+	public void setUnitA(CompilationUnit unitA) {
+		this.unitA = unitA;
 	}
 
 	public MethodDeclaration getMethodANode() {
@@ -96,8 +106,9 @@ public class ReplaceVisitor3 extends ASTVisitor {
 			}
 		} else {// methodBクラスの探索
 			if (node.getName().toString().equals(methodB.getMethodName())) {// methodBなら，メソッド名をmethodAに変更してnodeをreplace
-				node.setName(ast.newSimpleName(methodA.getMethodName()));
-				rewriter.replace(methodANode, methodBNode, editGroup);
+				node.setName(unitB.getAST().newSimpleName(methodA.getMethodName()));
+				rewriter.replace(methodANode, node, editGroup);
+				//methodANode.setName(ast.newSimpleName(methodA.getMethodName()));
 			} else {// methodB以外なら，methodAクラスにつっこむ
 				MethodDeclaration copiedNode = (MethodDeclaration) ASTNode.copySubtree(ast, node);
 				ListRewrite lrw = rewriter.getListRewrite(parent, parent.BODY_DECLARATIONS_PROPERTY);

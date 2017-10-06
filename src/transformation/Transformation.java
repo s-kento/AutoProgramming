@@ -10,16 +10,13 @@ import java.util.stream.Collectors;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
-import org.eclipse.text.edits.TextEditGroup;
 
 import register.SourceFileAnalyzer;
 import search.MethodInfo;
-import search.Search;
 
 public class Transformation {
 	public static void main(String[] args) throws Exception {
@@ -120,7 +117,7 @@ public class Transformation {
 		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
 		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
 
-		ReplaceVisitor3 visitor = new ReplaceVisitor3(unitA, methodA, methodB);
+		ReplaceVisitor3 visitor = new ReplaceVisitor3(unitA, unitB, methodA, methodB);
 		unitA.accept(visitor);
 		unitB.accept(visitor);
 		ASTRewrite rewriter=visitor.getRewriter();
