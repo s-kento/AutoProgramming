@@ -25,21 +25,32 @@ import java.util.zip.ZipFile;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import search.MethodInfo;
 import search.Search;
 import transformation.Transformation;
 
-public class Test {
+public class Test{
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException,
-			ParseException, DecoderException, InterruptedException {
-		test10(args);
+			ParseException, DecoderException, InterruptedException, ParserConfigurationException, SAXException {
+		//test10(args);
+		test11();
 	}
 
 	/*
@@ -254,11 +265,20 @@ public class Test {
 				continue;
 			}
 			Transformation trans = new Transformation();
-			System.out.println(
-					"target: " + targetMethod.getClassName()+"."+targetMethod.getMethodName() + ", evolved: "+targetEvolvedMethod.getClassName()+"." + targetEvolvedMethod.getMethodName());
+			System.out.println("target: " + targetMethod.getClassName() + "." + targetMethod.getMethodName()
+					+ ", evolved: " + targetEvolvedMethod.getClassName() + "." + targetEvolvedMethod.getMethodName());
 			System.out.println(trans.replaceCode3(targetMethod, targetEvolvedMethod));
 			break;
 		}
 	}
 
+	public static void test11() throws ParserConfigurationException, SAXException, IOException {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		//factory.setValidating(false);
+		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+		Document document = documentBuilder.parse(new File("commons-math.xml"));
+
+		Element root = document.getDocumentElement();
+		System.out.println("Node Name: "+root.getNodeName());
+	}
 }
