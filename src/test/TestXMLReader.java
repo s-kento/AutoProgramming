@@ -12,7 +12,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 public class TestXMLReader extends DefaultHandler {
-	String packageName;
 	String className;
 	String methodName;
 	double coverage;
@@ -36,13 +35,11 @@ public class TestXMLReader extends DefaultHandler {
 				isInMain = false;
 		}
 		if (isInMain) {
-			if ("package".equals(qName)) {
-				packageName = attributes.getValue("name");
-			}
 			if ("class".equals(qName)) {
 				className = attributes.getValue("name");
 			}
-			if ("method".equals(qName)) {
+			if ("method".equals(qName) && !"<init>".equals(attributes.getValue("name"))
+					&& !"<clinit>".equals(attributes.getValue("name"))) {
 				methodName = attributes.getValue("name");
 			}
 			if ("counter".equals(qName) && "INSTRUCTION".equals(attributes.getValue("type"))) {
@@ -56,7 +53,7 @@ public class TestXMLReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 		if (isInMain) {
 			if ("method".equals(qName)) {
-				System.out.println(packageName + "." + className + " " + methodName + ":" + coverage * 100 + "%");
+				System.out.println(getAbsoluteClassName(className) + " " + methodName + ":" + coverage * 100 + "%");
 			}
 		}
 	}
@@ -64,4 +61,11 @@ public class TestXMLReader extends DefaultHandler {
 	public void endDocument() {// [50]
 		System.out.println("[51] ドキュメント終了");
 	}
+
+	public String getAbsoluteClassName(String className){
+		String absClassName=className;
+
+		return absClassName;
+	}
+
 }
