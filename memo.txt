@@ -38,3 +38,10 @@ org.apache.commons.text.StrBuilderTest
 
 Suspicious Code
 className=org.apache.commons.text.StrBuilder, methodName=org.apache.commons.text.StrBuilder{endsWith(Ljava/lang/String;)Z 0.0, lineNumber=2182, susp=1.0
+
+
+-location ./commons-math  -mode  jgenprog  -scope  global
+							-failing DerivativeStructureTest  -srcjavafolder  /src/main/java/
+							-srctestfolder /src/test/ -binjavafolder /target/classes  -bintestfolder
+							/target/test-classes -flthreshold 0.5  -seed 4 -maxtime 100
+							-stopfirst true -dependencies work/commons-numbers-core-1.0-SNAPSHOT.jar;work/commons-numbers-gamma-1.0-SNAPSHOT.jar;work/commons-numbers-angle-1.0-SNAPSHOT.jar;work/commons-numbers-arrays-1.0-SNAPSHOT.jar;work/commons-rng-client-api-1.0.jar;work/commons-rng-simple-1.0.jar;work/commons-rng-sampling-1.1-SNAPSHOT.jar;work/jmh-core-1.13.jar;work/jmh-generator-annprocess-1.13.jar;work/junit-4.11.jar
