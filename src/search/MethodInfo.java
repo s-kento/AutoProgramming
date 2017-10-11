@@ -7,6 +7,7 @@ import org.apache.commons.codec.binary.Hex;
  * メソッド情報を持つクラス
  */
 public class MethodInfo {
+	private int id;
 	private String filePath;
 	private String returnType;
 	private String methodName;
@@ -14,11 +15,13 @@ public class MethodInfo {
 	private String className;
 	private String projectName;
 	private int startLine;
+	private int endLine;
 	private String sourceCode;
 
 
-	MethodInfo(String filePath, String className, String methodName, String returnType, String parameterType,
-			String projectName, int startLine, String sourceCode) throws DecoderException {
+	MethodInfo(int id, String filePath, String className, String methodName, String returnType, String parameterType,
+			String projectName, int startLine, int endLine, String sourceCode) throws DecoderException {
+		setId(id);
 		setFilePath(filePath);
 		setClassName(className);
 		setMethodName(methodName);
@@ -26,7 +29,24 @@ public class MethodInfo {
 		setParameterType(parameterType);
 		setProjectName(projectName);
 		setStartLine(startLine);
+		setEndLine(endLine);
 		setSourceCode(sourceCode);
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getEndLine() {
+		return endLine;
+	}
+
+	public void setEndLine(int endLine) {
+		this.endLine = endLine;
 	}
 
 	public String getFilePath() {

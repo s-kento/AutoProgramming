@@ -2,6 +2,9 @@ package xml;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,6 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.codec.DecoderException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -27,6 +32,8 @@ public class XMLReader extends DefaultHandler {
 	boolean isMethod;
 	int methodNumber = 0;
 	int perfectCoverage = 0;
+	int lineNumber;
+	List<CoverageInfo> coverages = new ArrayList<>();
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
 		SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
@@ -54,6 +61,7 @@ public class XMLReader extends DefaultHandler {
 					isMethod = false;
 				else {
 					methodName = attributes.getValue("name");
+					lineNumber = Integer.parseInt(attributes.getValue("line"));
 					isMethod = true;
 					methodNumber++;
 				}
@@ -69,17 +77,29 @@ public class XMLReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 		if (isInMain) {
 			if ("method".equals(qName) && isMethod) {
-				System.out.println(getAbsoluteClassName(className) + " " + methodName + ":" + coverage * 100 + "%");
+				//System.out.println(getAbsoluteClassName(className) + " " + methodName + ":" + coverage * 100 + "%");
 				if ((double) 1 == coverage)
 					perfectCoverage++;
+				CoverageInfo coverageInfo = new CoverageInfo(getAbsoluteClassName(className), methodName, lineNumber, coverage);
+				coverages.add(coverageInfo);
 			}
 		}
 	}
 
 	public void endDocument() {// [50]
 		System.out.println("[51] ドキュメント終了");
-		System.out.println("メソッド数： " + methodNumber);
-		System.out.println(perfectCoverage);
+		//System.out.println("メソッド数： " + methodNumber);
+		//System.out.println(perfectCoverage);
+		CoverageRegister register = new CoverageRegister();
+		try {
+			try {
+				register.regist(coverages);
+			} catch (ParseException | DecoderException | IOException e) {
+				e.printStackTrace();
+			}
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 

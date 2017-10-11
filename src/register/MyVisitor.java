@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -31,6 +32,8 @@ public class MyVisitor extends ASTVisitor {
 	private String className;
 	private String projectName;
 	private int startLine;
+	private int endLine;
+
 	private String sourceCode;
 
 	private SQLite db;
@@ -100,6 +103,14 @@ public class MyVisitor extends ASTVisitor {
 		this.startLine = startLine;
 	}
 
+	public int getEndLine() {
+		return endLine;
+	}
+
+	public void setEndLine(int endLine) {
+		this.endLine = endLine;
+	}
+
 	public String getSourceCode() {
 		return sourceCode;
 	}
@@ -110,16 +121,16 @@ public class MyVisitor extends ASTVisitor {
 
 	/******************************************************************/
 
-	/*
+/*
 	 * クラス名を取得
-	 */
+
 	@Override
 	public boolean visit(TypeDeclaration node) {
 		if (node.isInterface()) // インターフェースは無視
 			return false;
 		setClassName(getFQName(node));
 		return true;
-	}
+	}*/
 
 	/*
 	 * メソッドのシグネチャ情報を取得
@@ -127,7 +138,10 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (!node.isConstructor() && node.getReturnType2() != null) { // コンストラクタ，ENUM宣言は無視する．
+			TypeDeclaration parent = getParentTypeDeclaration(node);
+			setClassName(getFQName(parent));
 			setStartLine(unit.getLineNumber(node.getStartPosition() - 1));
+			setEndLine(unit.getLineNumber(node.getStartPosition()+node.getLength()));
 			setSourceCode(toHexString(node.toString()));
 			setMethodName(node.getName().toString());
 			setReturnType(getFQName(node.getReturnType2()));
@@ -144,7 +158,7 @@ public class MyVisitor extends ASTVisitor {
 
 			showMethodInfo(this); // メソッド情報を標準出力に表示
 			try {// メソッド情報をデータベースに登録
-				db.register(this);
+				db.regist(this);
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}
@@ -228,5 +242,15 @@ public class MyVisitor extends ASTVisitor {
 		String hexstr = new String(Hex.encodeHex(bytes));
 
 		return hexstr;
+	}
+
+	public TypeDeclaration getParentTypeDeclaration(ASTNode node) {
+		ASTNode parent = (ASTNode) node;
+		while (true) {
+			parent = parent.getParent();
+			if (parent instanceof TypeDeclaration)
+				break;
+		}
+		return (TypeDeclaration) parent;
 	}
 }

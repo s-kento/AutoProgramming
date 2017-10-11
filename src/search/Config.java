@@ -17,6 +17,7 @@ public class Config {
 		options.addOption("r", "returntype", true, "返値の型");
 		options.addOption("d", "database", true, "データベース名");
 		options.addOption("t", "table", true, "テーブル名");
+		options.addOption("i", "id", true, "ID");
 
 		CommandLineParser parser = new BasicParser();
 		CommandLine commandLine;

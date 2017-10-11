@@ -38,22 +38,25 @@ public class SQLite {
 	 *
 	 * @param visitor
 	 */
-	public void register(MyVisitor visitor) throws SQLException, ClassNotFoundException {
+	public void regist(MyVisitor visitor) throws SQLException, ClassNotFoundException {
 		Class.forName("org.sqlite.JDBC");
 		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
 		statement = connection.createStatement();
 		List<String> parameterType = visitor.getParameterType();
 
 		/* テーブルがなければ作成する */
-		String sql = "create table if not exists " +table
-				+ "(filepath text, classname text, methodname text, returntype text, parametertype text, projectname text, startline numeric, sourcecode text)";
+		String sql = "create table if not exists " + table
+				+ "(id integer primary key, filepath text, classname text, methodname text, returntype text, parametertype text, "
+				+ "projectname text, startline numeric, endline numeric, sourcecode text)";
 		statement.executeUpdate(sql);
-		sql="create index if not exists signature on "+table+"(returntype,parametertype)";
+		sql = "create index if not exists signature on " + table + "(returntype,parametertype)";
 		statement.executeUpdate(sql);
 
 		/* SQL文の作成・ここから */
-		sql = "insert into " + table + " values(\'" + visitor.getFilePath() + "\',\'" + visitor.getClassName() + "\',\'"
-				+ visitor.getMethodName() + "\',\'" + visitor.getReturnType() + "\',\'";
+		sql = "insert into " + table
+				+ "(filepath, classname, methodname, returntype, parametertype, projectname, startline, endline, sourcecode) values(\'"
+				+ visitor.getFilePath() + "\',\'" + visitor.getClassName() + "\',\'" + visitor.getMethodName() + "\',\'"
+				+ visitor.getReturnType() + "\',\'";
 		String params = "";
 		for (int i = 0; i < parameterType.size(); i++) {
 			params += parameterType.get(i);
@@ -61,8 +64,8 @@ public class SQLite {
 				params += ",";
 			}
 		}
-		sql += params + "\',\'" + visitor.getProjectName() + "\',\'" + visitor.getStartLine() + "\',\'"
-				+ visitor.getSourceCode() + "\')";
+		sql += params + "\',\'" + visitor.getProjectName() + "\'," + visitor.getStartLine() + "," + visitor.getEndLine()
+				+ ",\'" + visitor.getSourceCode() + "\')";
 		/* SQL文の作成・ここまで */
 
 		statement.executeUpdate(sql);// SQL文の実行
@@ -98,6 +101,9 @@ public class SQLite {
 
 		/* SQL文の作成・ここから */
 		String sql = "select * from " + table + " where 1=1";
+		if (cl.hasOption("i")) {
+			sql += " and id=" + cl.getOptionValue("i");
+		}
 		if (cl.hasOption("f")) {
 			sql += " and filepath=\'" + cl.getOptionValue("f") + "\'";
 		}
@@ -129,8 +135,8 @@ public class SQLite {
 		/* MethodInfoクラスの生成 */
 		List<MethodInfo> methods = new ArrayList<MethodInfo>();
 		while (rs.next()) {
-			MethodInfo method = new MethodInfo(rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4),
-					rs.getString(5), rs.getString(6), rs.getInt(7), rs.getString(8));
+			MethodInfo method = new MethodInfo(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4),
+					rs.getString(5), rs.getString(6), rs.getString(7), rs.getInt(8), rs.getInt(9), rs.getString(10));
 			methods.add(method);
 		}
 
