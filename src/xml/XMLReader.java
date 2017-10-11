@@ -15,6 +15,7 @@ import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * eclemmaのxmlファイルを解析するクラス
+ *
  * @author s-kento
  *
  */
@@ -33,7 +34,7 @@ public class XMLReader extends DefaultHandler {
 		saxParser.parse(new File("commons-math.xml"), new XMLReader());
 	}
 
-	public void startDocument() {// [10]
+	public void startDocument() {
 		System.out.println("[11] ドキュメント開始");
 	}
 
@@ -53,7 +54,7 @@ public class XMLReader extends DefaultHandler {
 					isMethod = false;
 				else {
 					methodName = attributes.getValue("name");
-					isMethod=true;
+					isMethod = true;
 					methodNumber++;
 				}
 			}
@@ -81,15 +82,31 @@ public class XMLReader extends DefaultHandler {
 		System.out.println(perfectCoverage);
 	}
 
+
+	/**
+	 *'/'を'.'に置換
+	 *内部クラスの表記,'$'を除去(クラス名があるならばそれに，匿名クラスならスーパークラスの名前にする)
+	 * @param className
+	 * @return 絶対クラス名
+	 */
 	public String getAbsoluteClassName(String className) {
 		String absClassName = className;
-		String regex = "/";
-		Pattern p = Pattern.compile(regex);
-		Matcher m = p.matcher(absClassName);
-		absClassName = m.replaceAll("\\.");
-		int index = absClassName.lastIndexOf(".");
-		String packageName = absClassName.substring(0, index);
+		final String regex1 = "/";
+		final Pattern p1 = Pattern.compile(regex1);
+		final Matcher m1 = p1.matcher(absClassName);
+		absClassName = m1.replaceAll("\\.");
+		final int index = absClassName.lastIndexOf(".");
+		final String packageName = absClassName.substring(0, index);
 		String classNameWithoutPackage = absClassName.substring(index + 1);
+		String[] splitedClassName = classNameWithoutPackage.split("\\$");
+		if (splitedClassName.length > 1) {
+			if (Pattern.matches("^[0-9]", splitedClassName[1])) {
+				classNameWithoutPackage = splitedClassName[0];
+			} else {
+				classNameWithoutPackage = splitedClassName[1];
+			}
+		}
+
 		return packageName + "." + classNameWithoutPackage;
 	}
 
