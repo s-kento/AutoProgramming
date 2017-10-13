@@ -46,6 +46,7 @@ public class CoverageRegister {
 		for (CoverageInfo coverageInfo : coverages) {
 			id = getMethodID(coverageInfo);
 			if (id > 0) {//一致するメソッドがあれば
+				System.out.println(coverageInfo.getClassName()+" "+coverageInfo.getMethodName()+"登録開始");
 				sql = "insert into " + table + " values(" + id + ", " + coverageInfo.getCoverage() + ")";
 				statement.executeUpdate(sql);// SQL文の実行
 			} else {//一致するメソッドがなければ
