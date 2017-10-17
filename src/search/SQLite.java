@@ -14,6 +14,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.codec.DecoderException;
 
 import register.MyVisitor;
+import xml.CoverageInfo;
 
 /*
  * DBに接続するクラス
@@ -155,5 +156,34 @@ public class SQLite {
 			e.printStackTrace();
 		}
 		return methods;
+	}
+
+	public double getCoverage(String id) throws ClassNotFoundException, SQLException{
+		Class.forName("org.sqlite.JDBC");
+		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
+		statement = connection.createStatement();
+
+		final String sql = "select * from " + table + " where id="+id;
+		final ResultSet rs = statement.executeQuery(sql);
+		final double coverage;
+		if(rs.next())
+			coverage = rs.getDouble(2);
+		else
+			coverage=-1;
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return coverage;
 	}
 }

@@ -43,6 +43,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import search.MethodInfo;
+import search.SQLite;
 import search.Search;
 import transformation.Transformation;
 
@@ -50,7 +51,7 @@ public class Test{
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException,
 			ParseException, DecoderException, InterruptedException, ParserConfigurationException, SAXException {
 		//test10(args);
-		test11();
+		test12();
 	}
 
 	/*
@@ -280,5 +281,17 @@ public class Test{
 
 		Element root = document.getDocumentElement();
 		System.out.println("Node Name: "+root.getNodeName());
+	}
+
+	public static void test12() throws ClassNotFoundException, SQLException{
+		SQLite sqLite = new SQLite(null, "coverages");
+		double coverage;
+		int num=0;
+		for(int i=1;i<5742;i++){
+			coverage=sqLite.getCoverage(String.valueOf(i));
+			if(coverage==(double)1)
+				num++;
+		}
+		System.out.println(num);
 	}
 }

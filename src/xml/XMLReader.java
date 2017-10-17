@@ -77,10 +77,12 @@ public class XMLReader extends DefaultHandler {
 	public void endElement(String uri, String localName, String qName) {
 		if (isInMain) {
 			if ("method".equals(qName) && isMethod) {
-				//System.out.println(getAbsoluteClassName(className) + " " + methodName + ":" + coverage * 100 + "%");
+				// System.out.println(getAbsoluteClassName(className) + " " +
+				// methodName + ":" + coverage * 100 + "%");
 				if ((double) 1 == coverage)
 					perfectCoverage++;
-				CoverageInfo coverageInfo = new CoverageInfo(getAbsoluteClassName(className), methodName, lineNumber, coverage);
+				CoverageInfo coverageInfo = new CoverageInfo(getAbsoluteClassName(className), methodName, lineNumber,
+						coverage);
 				coverages.add(coverageInfo);
 			}
 		}
@@ -88,8 +90,8 @@ public class XMLReader extends DefaultHandler {
 
 	public void endDocument() {// [50]
 		System.out.println("[51] ドキュメント終了");
-		//System.out.println("メソッド数： " + methodNumber);
-		//System.out.println(perfectCoverage);
+		// System.out.println("メソッド数： " + methodNumber);
+		// System.out.println(perfectCoverage);
 		CoverageRegister register = new CoverageRegister();
 		try {
 			try {
@@ -102,14 +104,14 @@ public class XMLReader extends DefaultHandler {
 		}
 	}
 
-
 	/**
-	 *'/'を'.'に置換
-	 *内部クラスの表記,'$'を除去(クラス名があるならばそれに，匿名クラスならスーパークラスの名前にする)
+	 * '/'を'.'に置換
+	 *
 	 * @param className
 	 * @return 絶対クラス名
 	 */
 	public String getAbsoluteClassName(String className) {
+
 		String absClassName = className;
 		final String regex1 = "/";
 		final Pattern p1 = Pattern.compile(regex1);
@@ -120,10 +122,11 @@ public class XMLReader extends DefaultHandler {
 		String classNameWithoutPackage = absClassName.substring(index + 1);
 		String[] splitedClassName = classNameWithoutPackage.split("\\$");
 		if (splitedClassName.length > 1) {
-			if (Pattern.matches("^[0-9]", splitedClassName[1])) {
-				classNameWithoutPackage = splitedClassName[0];
-			} else {
-				classNameWithoutPackage = splitedClassName[1];
+			classNameWithoutPackage=splitedClassName[0];
+			for (int i = 1; i < splitedClassName.length; i++) {
+				if (!Pattern.matches("^[0-9]", splitedClassName[i])) {
+					classNameWithoutPackage +="$"+ splitedClassName[i];
+				}
 			}
 		}
 

@@ -42,6 +42,11 @@ public class Transformation {
 		gen.execute(args);
 	}
 
+	public void execute(String[] args, MethodInfo targetMethod) throws Exception {
+		GenProg gen = new GenProg();
+		gen.execute(args, targetMethod);
+	}
+
 	/**
 	 * メソッドAのコードをメソッドBのコードに置き換える
 	 *
