@@ -5,12 +5,14 @@ public class CoverageInfo {
 	private String methodName;
 	private int lineNumber;
 	private double coverage;
+	private double branchCoverage=-1;
 
-	public CoverageInfo(String className, String methodName, int lineNumber, double coverage){
+	public CoverageInfo(String className, String methodName, int lineNumber, double coverage, double branchCoverage){
 		setClassName(className);
 		setMethodName(methodName);
 		setLineNumber(lineNumber);
 		setCoverage(coverage);
+		setBranchCoverage(branchCoverage);
 	}
 
 	public String getClassName() {
@@ -38,5 +40,13 @@ public class CoverageInfo {
 
 	public void setCoverage(double coverage) {
 		this.coverage = coverage;
+	}
+
+	public double getBranchCoverage() {
+		return branchCoverage;
+	}
+
+	public void setBranchCoverage(double branchCoverage) {
+		this.branchCoverage = branchCoverage;
 	}
 }

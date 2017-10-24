@@ -35,7 +35,7 @@ import transformation.Transformation;
 
 public class Main {
 	final static int limit = 20;
-	final static int startId=1;
+	final static int startId=612;
 
 	public static void main(String[] args) throws Exception {
 		initialize();
@@ -45,7 +45,7 @@ public class Main {
 
 	public static void execute(String[] args) throws Exception {
 		final Logger logger = Logger.getLogger("ExperimetLogging");
-		FileHandler fh = new FileHandler("ExperimentLog.log");
+		FileHandler fh = new FileHandler("ExperimentLog.log",true);
 		fh.setFormatter(new java.util.logging.SimpleFormatter());
 		logger.addHandler(fh);
 
@@ -55,7 +55,7 @@ public class Main {
 		List<MethodInfo> methods = search.execute(args);//idの昇順で並んでいる
 		splitList(methods,startId);
 		for (MethodInfo targetMethod : methods) {
-			if (!isCoverage100(targetMethod))
+			if (!isCoverage100(targetMethod)||!isBranchCoverage100(targetMethod))
 				continue;
 			logger.info("メソッドid "+targetMethod.getId()+"の進化開始");
 			String targetAbsClassName = targetMethod.getClassName();
@@ -79,7 +79,7 @@ public class Main {
 			Transformation trans = new Transformation();
 			Controller ctr = new Controller();
 			for (MethodInfo evMethod : evolvedMethods) {
-				if (targetMethod.equals(evMethod)||!isCoverage100(evMethod))
+				if (targetMethod.equals(evMethod)||!isCoverage100(evMethod)||!isBranchCoverage100(evMethod))
 					continue;
 				TestCaseInfo testcase = new TestCaseInfo(targetMethod);
 				System.out.println("target: " + targetMethod.getClassName() + ", " + targetMethod.getMethodName());
@@ -133,8 +133,8 @@ public class Main {
 					break;
 				}
 			}
-			if (num >= limit)
-				break;
+			/*if (num >= limit)
+				break;*/
 		}
 	}
 
@@ -280,6 +280,17 @@ public class Main {
 		else
 			return false;
 	}
+
+	public static boolean isBranchCoverage100(MethodInfo targetMethod) throws ClassNotFoundException, SQLException{
+		SQLite sqLite = new SQLite(null, "coverages");
+		final double branchCoverage;
+		branchCoverage = sqLite.getBranchCoverage(String.valueOf(targetMethod.getId()));
+		if (branchCoverage == 1)
+			return true;
+		else
+			return false;
+	}
+
 
 	/**
 	 * startIdよりも若いIDのメソッドは切り捨てる

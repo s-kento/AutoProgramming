@@ -186,4 +186,33 @@ public class SQLite {
 		}
 		return coverage;
 	}
+
+	public double getBranchCoverage(String id) throws ClassNotFoundException, SQLException{
+		Class.forName("org.sqlite.JDBC");
+		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
+		statement = connection.createStatement();
+
+		final String sql = "select * from " + table + " where id="+id;
+		final ResultSet rs = statement.executeQuery(sql);
+		final double branchCoverage;
+		if(rs.next())
+			branchCoverage = rs.getDouble(3);
+		else
+			branchCoverage=-1;
+		try {
+			if (statement != null) {
+				statement.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		try {
+			if (connection != null) {
+				connection.close();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return branchCoverage;
+	}
 }

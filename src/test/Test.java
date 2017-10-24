@@ -51,7 +51,7 @@ public class Test{
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException,
 			ParseException, DecoderException, InterruptedException, ParserConfigurationException, SAXException {
 		//test10(args);
-		test12();
+		test13();
 	}
 
 	/*
@@ -290,6 +290,20 @@ public class Test{
 		for(int i=1;i<5742;i++){
 			coverage=sqLite.getCoverage(String.valueOf(i));
 			if(coverage==(double)1)
+				num++;
+		}
+		System.out.println(num);
+	}
+
+	public static void test13() throws ClassNotFoundException, SQLException{
+		SQLite sqLite = new SQLite(null, "coverages");
+		double coverage;
+		double branchCoverage;
+		int num=0;
+		for(int i=1;i<5664;i++){
+			coverage=sqLite.getCoverage(String.valueOf(i));
+			branchCoverage=sqLite.getBranchCoverage(String.valueOf(i));
+			if(coverage==(double)1&&branchCoverage==(double)1)
 				num++;
 		}
 		System.out.println(num);

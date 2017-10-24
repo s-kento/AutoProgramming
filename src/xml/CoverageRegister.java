@@ -36,7 +36,7 @@ public class CoverageRegister {
 		statement = connection.createStatement();
 
 		/* テーブルがなければ作成する */
-		String sql = "create table if not exists " + table + "(id integer primary key, coverage numeric)";
+		String sql = "create table if not exists " + table + "(id integer primary key, coverage numeric, branchcoverage numeric)";
 		statement.executeUpdate(sql);
 		sql = "create index if not exists signature on " + table + "(id)";
 		statement.executeUpdate(sql);
@@ -47,7 +47,7 @@ public class CoverageRegister {
 			id = getMethodID(coverageInfo);
 			if (id > 0) {//一致するメソッドがあれば
 				System.out.println(coverageInfo.getClassName()+" "+coverageInfo.getMethodName()+"登録開始");
-				sql = "insert into " + table + " values(" + id + ", " + coverageInfo.getCoverage() + ")";
+				sql = "insert into " + table + " values(" + id + ", " + coverageInfo.getCoverage() + ", "+coverageInfo.getBranchCoverage()+")";
 				statement.executeUpdate(sql);// SQL文の実行
 			} else {//一致するメソッドがなければ
 				System.out.println(coverageInfo.getClassName()+" "+coverageInfo.getMethodName()+" is not found");

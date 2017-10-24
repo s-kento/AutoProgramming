@@ -28,8 +28,12 @@ public class XMLReader extends DefaultHandler {
 	String className;
 	String methodName;
 	double coverage;
+	double branchCoverage;
+	double covered;
+	double missed;
 	boolean isInMain;
 	boolean isMethod;
+	boolean existsBranchCoverage = false;
 	int methodNumber = 0;
 	int perfectCoverage = 0;
 	int lineNumber;
@@ -67,9 +71,15 @@ public class XMLReader extends DefaultHandler {
 				}
 			}
 			if ("counter".equals(qName) && "INSTRUCTION".equals(attributes.getValue("type")) && isMethod) {
-				double covered = Double.parseDouble(attributes.getValue("covered"));
-				double missed = Double.parseDouble(attributes.getValue("missed"));
+				covered = Double.parseDouble(attributes.getValue("covered"));
+				missed = Double.parseDouble(attributes.getValue("missed"));
 				coverage = covered / (covered + missed);
+			}
+			if ("counter".equals(qName) && "BRANCH".equals(attributes.getValue("type")) && isMethod) {
+				existsBranchCoverage = true;
+				covered = Double.parseDouble(attributes.getValue("covered"));
+				missed = Double.parseDouble(attributes.getValue("missed"));
+				branchCoverage = covered / (covered + missed);
 			}
 		}
 	}
@@ -81,9 +91,12 @@ public class XMLReader extends DefaultHandler {
 				// methodName + ":" + coverage * 100 + "%");
 				if ((double) 1 == coverage)
 					perfectCoverage++;
+				if (!existsBranchCoverage)
+					branchCoverage = -1;
 				CoverageInfo coverageInfo = new CoverageInfo(getAbsoluteClassName(className), methodName, lineNumber,
-						coverage);
+						coverage, branchCoverage);
 				coverages.add(coverageInfo);
+				existsBranchCoverage = false;
 			}
 		}
 	}
@@ -122,10 +135,10 @@ public class XMLReader extends DefaultHandler {
 		String classNameWithoutPackage = absClassName.substring(index + 1);
 		String[] splitedClassName = classNameWithoutPackage.split("\\$");
 		if (splitedClassName.length > 1) {
-			classNameWithoutPackage=splitedClassName[0];
+			classNameWithoutPackage = splitedClassName[0];
 			for (int i = 1; i < splitedClassName.length; i++) {
 				if (!Pattern.matches("^[0-9]", splitedClassName[i])) {
-					classNameWithoutPackage +="$"+ splitedClassName[i];
+					classNameWithoutPackage += "$" + splitedClassName[i];
 				}
 			}
 		}
