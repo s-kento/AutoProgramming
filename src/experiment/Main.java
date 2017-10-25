@@ -2,7 +2,7 @@ package experiment;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,13 +14,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.codec.DecoderException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.junit.runner.JUnitCore;
@@ -34,11 +33,9 @@ import transformation.Controller;
 import transformation.Transformation;
 
 public class Main {
-	final static int limit = 20;
-	final static int startId=612;
 
 	public static void main(String[] args) throws Exception {
-		initialize();
+		//initialize();
 		execute(args);
 
 	}
@@ -49,7 +46,14 @@ public class Main {
 		fh.setFormatter(new java.util.logging.SimpleFormatter());
 		logger.addHandler(fh);
 
+		Properties properties = new Properties();
+		final InputStream pinput = new FileInputStream(new File("experiment.properties"));
+		properties.load(pinput);
+		pinput.close();
+
 		/* 進化させるメソッドを取得 */
+		final int limit = Integer.parseInt(properties.getProperty("limit"));
+		final int startId=Integer.parseInt(properties.getProperty("startId"));
 		int num = 0;
 		Search search = new Search();
 		List<MethodInfo> methods = search.execute(args);//idの昇順で並んでいる
