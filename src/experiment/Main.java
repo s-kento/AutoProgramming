@@ -34,6 +34,8 @@ import transformation.Transformation;
 
 public class Main {
 
+	static Properties properties = new Properties();
+
 	public static void main(String[] args) throws Exception {
 		//initialize();
 		execute(args);
@@ -42,54 +44,48 @@ public class Main {
 
 	public static void execute(String[] args) throws Exception {
 		final Logger logger = Logger.getLogger("ExperimetLogging");
-		FileHandler fh = new FileHandler("ExperimentLog.log",true);
+		FileHandler fh = new FileHandler("ExperimentLog.log", true);
 		fh.setFormatter(new java.util.logging.SimpleFormatter());
 		logger.addHandler(fh);
 
-		Properties properties = new Properties();
 		final InputStream pinput = new FileInputStream(new File("experiment.properties"));
 		properties.load(pinput);
 		pinput.close();
 
 		/* 進化させるメソッドを取得 */
 		final int limit = Integer.parseInt(properties.getProperty("limit"));
-		final int startId=Integer.parseInt(properties.getProperty("startId"));
+		final int startId = Integer.parseInt(properties.getProperty("startId"));
 		int num = 0;
 		Search search = new Search();
 		List<MethodInfo> methods = search.execute(args);//idの昇順で並んでいる
-		splitList(methods,startId);
+		splitList(methods, startId);
 		for (MethodInfo targetMethod : methods) {
-			if (!isCoverage100(targetMethod)||!isBranchCoverage100(targetMethod))
+			if (!isCoverage100(targetMethod) || !isBranchCoverage100(targetMethod))
 				continue;
-			logger.info("メソッドid "+targetMethod.getId()+"の進化開始");
+			logger.info("メソッドid " + targetMethod.getId() + "の進化開始");
 			String targetAbsClassName = targetMethod.getClassName();
-			File dstsrcDir = new File("work\\commons-math\\src\\main\\java\\" + toDirectoryName(targetAbsClassName));
-			File dstclassDir = new File("work\\commons-math\\target\\classes\\" + toDirectoryName(targetAbsClassName));
+			File dstsrcDir = new File(properties.getProperty("targetsrcDir") + toDirectoryName(targetAbsClassName));
+			File dstclassDir = new File(properties.getProperty("targetclassDir") + toDirectoryName(targetAbsClassName));
 			String targetJavaFileName = new File(targetMethod.getFilePath()).getName();
 			String targetClassName = FilenameUtils.removeExtension(targetJavaFileName);
-			String projectJarFileName = "work\\commons-math\\target\\commons-math4-4.0-SNAPSHOT.jar";
-			String dependencies = "work\\commons-numbers-core-1.0-SNAPSHOT.jar;work\\commons-numbers-gamma-1.0-SNAPSHOT.jar;"
-					+ "work\\commons-numbers-angle-1.0-SNAPSHOT.jar;work\\commons-numbers-arrays-1.0-SNAPSHOT.jar;"
-					+ "work\\commons-rng-client-api-1.0.jar;work\\commons-rng-simple-1.0.jar;work\\commons-rng-sampling-1.1-SNAPSHOT.jar;"
-					+ "work\\jmh-core-1.13.jar;work\\jmh-generator-annprocess-1.13.jar;work\\junit-4.11.jar;"
-					+ "work\\commons-numbers-fraction-1.0-SNAPSHOT.jar;work\\commons-rng-core-1.0.jar;work\\jopt-simple-4.6.jar;"
-					+ "work\\commons-math3-3.2.jar;work\\hamcrest-core-1.3.jar;work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar";
+			String projectJarFileName = properties.getProperty("projectJarFileName");
+			String dependencies = properties.getProperty("dependecies");
 			String[] targetArgs = { "-r", targetMethod.getReturnType(), "-p", targetMethod.getParameterType(), "-m",
-					targetMethod.getMethodName(), "-P", "commons-math" };
+					targetMethod.getMethodName(), "-P", properties.getProperty("targetProject") };
 			List<MethodInfo> evolvedMethods = search.execute(targetArgs);
-			logger.info("進化対象のメソッド数："+evolvedMethods.size());
+			logger.info("進化対象のメソッド数：" + evolvedMethods.size());
 
 			/* メソッドの書き換え，コンパイル */
 			Transformation trans = new Transformation();
 			Controller ctr = new Controller();
 			for (MethodInfo evMethod : evolvedMethods) {
-				if (targetMethod.equals(evMethod)||!isCoverage100(evMethod)||!isBranchCoverage100(evMethod))
+				if (targetMethod.equals(evMethod) || !isCoverage100(evMethod) || !isBranchCoverage100(evMethod))
 					continue;
 				TestCaseInfo testcase = new TestCaseInfo(targetMethod);
 				System.out.println("target: " + targetMethod.getClassName() + ", " + targetMethod.getMethodName());
 				System.out.println("evoleved: " + evMethod.getClassName() + ", " + evMethod.getMethodName());
 				String replacedCode = trans.replaceCode(targetMethod, evMethod);
-				File targetJavaFile = new File("work\\" + targetJavaFileName);
+				File targetJavaFile = new File(properties.getProperty("workingDir") + targetJavaFileName);
 				FileWriter filewriter = new FileWriter(targetJavaFile);
 				filewriter.write(replacedCode);
 				filewriter.close();
@@ -98,8 +94,8 @@ public class Main {
 				if (r != 0)
 					continue;
 				else {// コンパイル成功
-					logger.info("メソッドid "+evMethod.getId()+"コンパイル成功");
-					File[] files = new File(".\\work").listFiles();
+					logger.info("メソッドid " + evMethod.getId() + "コンパイル成功");
+					File[] files = new File(properties.getProperty("workingDir")).listFiles();
 					List<String> targetClassFileNames = new ArrayList<>();
 					for (File file : files) {
 						if (file.getPath().endsWith(".class")) {
@@ -109,7 +105,9 @@ public class Main {
 					TestCaseChecker.taihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
 					FileUtils.moveFileToDirectory(targetJavaFile, dstsrcDir, false);
 					for (String targetClassFileName : targetClassFileNames) {
-						FileUtils.moveFileToDirectory(new File("work\\" + targetClassFileName), dstclassDir, false);
+						FileUtils.moveFileToDirectory(
+								new File(properties.getProperty("workingDir") + targetClassFileName), dstclassDir,
+								false);
 					}
 					TestCaseRunnerThread th = new TestCaseRunnerThread(targetClassName,
 							Main.toPackageName(targetAbsClassName), testcase);
@@ -120,20 +118,22 @@ public class Main {
 					}
 					if (testcase.existsTestCase()) {
 						logger.info("テストケース成功．GenProg起動");
-						String[] arguments = { "-location", "./work/commons-math", "-mode", "jgenprog", "-scope",
+						String[] arguments = { "-location", properties.getProperty("location"), "-mode", "jgenprog",
+								"-scope",
 								"global", "-failing", targetAbsClassName + "Test", "-srcjavafolder", "/src/main/java/",
 								"-srctestfolder", "/src/test/", "-binjavafolder", "/target/classes", "-bintestfolder",
-								"/target/test-classes", "-flthreshold", "0.5", "-seed", "4", "-maxtime", "10",
+								"/target/test-classes", "-flthreshold", "0.5", "-seed", properties.getProperty("seed"),
+								"-maxtime", properties.getProperty("maxtime"),
 								"-stopfirst", "true", "-dependencies", dependencies, "-out",
 								"./outputMutation_" + targetMethod.getId() };
-						trans.execute(arguments,targetMethod);
+						trans.execute(arguments, targetMethod);
 						logger.info("GenProg終了");
 						num++;
 					}
 					TestCaseChecker.untaihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
 				}
 				if (isSuccess(targetMethod)) {
-					logger.info("メソッドid "+targetMethod.getId()+"の自動生成が成功");
+					logger.info("メソッドid " + targetMethod.getId() + "の自動生成が成功");
 					break;
 				}
 			}
@@ -149,11 +149,12 @@ public class Main {
 	 */
 	public static void initialize() throws IOException {
 		System.out.println("initializing working directory...");
-		File dir = new File("work\\commons-math");
+		File dir = new File(properties.getProperty("targetDir"));
 		if (dir.exists())
 			FileUtils.deleteDirectory(dir);
-		FileUtils.copyDirectory(new File("D:\\new_workspace\\commons-math"), new File("work\\commons-math"));
-		File[] files = new File(".\\work").listFiles();
+		FileUtils.copyDirectory(new File(properties.getProperty("originalDir")),
+				new File(properties.getProperty("targetDir")));
+		File[] files = new File(properties.getProperty("workingDir")).listFiles();
 		for (File file : files) {
 			if (file.getPath().endsWith(".java") || file.getPath().endsWith(".class"))
 				file.delete();
@@ -204,7 +205,7 @@ public class Main {
 	 */
 	public static boolean existsTestFile(String className, String packagePath) {
 		boolean exists = false;
-		File file = new File("work\\commons-math\\src\\test\\java\\" + packagePath + "\\" + className + "Test.java");
+		File file = new File(properties.getProperty("targettestDir") + packagePath + "\\" + className + "Test.java");
 		if (file.exists())
 			exists = true;
 		return exists;
@@ -223,14 +224,11 @@ public class Main {
 	public static boolean testFailed(String className, String packageName)
 			throws IOException, InterruptedException, ClassNotFoundException {
 		boolean failed = false;
-		String[] classFileName = { "work\\commons-math\\target\\test-classes\\", "work\\commons-math\\target\\classes",
-				"work\\commons-math3-3.2.jar", "work\\commons-numbers-angle-1.0-SNAPSHOT.jar",
-				"work\\commons-numbers-arrays-1.0-SNAPSHOT.jar", "work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar",
-				"work\\commons-numbers-core-1.0-SNAPSHOT.jar", "work\\commons-numbers-fraction-1.0-SNAPSHOT.jar",
-				"work\\commons-numbers-gamma-1.0-SNAPSHOT.jar", "work\\commons-rng-client-api-1.0.jar",
-				"work\\commons-rng-core-1.0.jar", "work\\commons-rng-sampling-1.1-SNAPSHOT.jar",
-				"work\\commons-rng-simple-1.0.jar", "work\\hamcrest-core-1.3.jar", "work\\jmh-core-1.13.jar",
-				"work\\jmh-generator-annprocess-1.13.jar", "work\\jopt-simple-4.6.jar", "work\\junit-4.11.jar" };
+		String[] dependencies = properties.getProperty("dependencies").split(";", -1);
+		List<String> classFileNameList = Arrays.asList(dependencies);
+		classFileNameList.add(properties.getProperty("targetclassDir"));
+		classFileNameList.add(properties.getProperty("targettestclassDir"));
+		String[] classFileName = (String[]) classFileNameList.toArray(new String[0]);
 		File[] classFiles = Arrays.stream(classFileName).map(File::new).toArray((e) -> new File[e]);
 		URL[] classFilesURL = new URL[classFiles.length];
 		for (int i = 0; i < classFiles.length; i++) {
@@ -266,8 +264,9 @@ public class Main {
 
 	public static boolean isSuccess(MethodInfo targetMethod) {
 		boolean success = false;
-		File[] output = new File("outputMutation_" + targetMethod.getId() + "\\AstorMain-commons-math\\src")
-				.listFiles();
+		File[] output = new File("outputMutation_" + targetMethod.getId() + "\\AstorMain-"
+				+ properties.getProperty("targetProject") + "\\src")
+						.listFiles();
 		if (null != output) {
 			if (output.length > 1)
 				success = true;
@@ -285,7 +284,7 @@ public class Main {
 			return false;
 	}
 
-	public static boolean isBranchCoverage100(MethodInfo targetMethod) throws ClassNotFoundException, SQLException{
+	public static boolean isBranchCoverage100(MethodInfo targetMethod) throws ClassNotFoundException, SQLException {
 		SQLite sqLite = new SQLite(null, "coverages");
 		final double branchCoverage;
 		branchCoverage = sqLite.getBranchCoverage(String.valueOf(targetMethod.getId()));
@@ -295,18 +294,17 @@ public class Main {
 			return false;
 	}
 
-
 	/**
 	 * startIdよりも若いIDのメソッドは切り捨てる
 	 * methodがIDで昇順になっていることが条件
 	 * @param methods
 	 * @param startId
 	 */
-	public static void splitList(List<MethodInfo> methods, int startId){
+	public static void splitList(List<MethodInfo> methods, int startId) {
 		Iterator<MethodInfo> it = methods.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			MethodInfo method = it.next();
-			if(method.getId()==startId)
+			if (method.getId() == startId)
 				break;
 			else
 				it.remove();
