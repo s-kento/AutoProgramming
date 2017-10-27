@@ -1,10 +1,13 @@
 package xml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,6 +28,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  */
 public class XMLReader extends DefaultHandler {
+	static Properties pr = new Properties();
 	String className;
 	String methodName;
 	double coverage;
@@ -40,9 +44,12 @@ public class XMLReader extends DefaultHandler {
 	List<CoverageInfo> coverages = new ArrayList<>();
 
 	public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
+		InputStream in = new FileInputStream(new File("experiment.properties"));
+		pr.load(in);
+		in.close();
 		SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
 		SAXParser saxParser = saxParserFactory.newSAXParser();
-		saxParser.parse(new File("commons-math.xml"), new XMLReader());
+		saxParser.parse(new File(pr.getProperty("xml")), new XMLReader());
 	}
 
 	public void startDocument() {

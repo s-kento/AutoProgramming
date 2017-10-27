@@ -14,7 +14,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.codec.DecoderException;
 
 import register.MyVisitor;
-import xml.CoverageInfo;
 
 /*
  * DBに接続するクラス
@@ -48,14 +47,14 @@ public class SQLite {
 		/* テーブルがなければ作成する */
 		String sql = "create table if not exists " + table
 				+ "(id integer primary key, filepath text, classname text, methodname text, returntype text, parametertype text, "
-				+ "projectname text, startline numeric, endline numeric, sourcecode text)";
+				+ "projectname text, startline numeric, endline numeric, statementnumber numeric, sourcecode text)";
 		statement.executeUpdate(sql);
 		sql = "create index if not exists signature on " + table + "(returntype,parametertype)";
 		statement.executeUpdate(sql);
 
 		/* SQL文の作成・ここから */
 		sql = "insert into " + table
-				+ "(filepath, classname, methodname, returntype, parametertype, projectname, startline, endline, sourcecode) values(\'"
+				+ "(filepath, classname, methodname, returntype, parametertype, projectname, startline, endline, statementnumber, sourcecode) values(\'"
 				+ visitor.getFilePath() + "\',\'" + visitor.getClassName() + "\',\'" + visitor.getMethodName() + "\',\'"
 				+ visitor.getReturnType() + "\',\'";
 		String params = "";
@@ -66,6 +65,7 @@ public class SQLite {
 			}
 		}
 		sql += params + "\',\'" + visitor.getProjectName() + "\'," + visitor.getStartLine() + "," + visitor.getEndLine()
+				+ "," + visitor.getStatementNumber()
 				+ ",\'" + visitor.getSourceCode() + "\')";
 		/* SQL文の作成・ここまで */
 
@@ -137,7 +137,7 @@ public class SQLite {
 		List<MethodInfo> methods = new ArrayList<MethodInfo>();
 		while (rs.next()) {
 			MethodInfo method = new MethodInfo(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4),
-					rs.getString(5), rs.getString(6), rs.getString(7), rs.getInt(8), rs.getInt(9), rs.getString(10));
+					rs.getString(5), rs.getString(6), rs.getString(7), rs.getInt(8), rs.getInt(9), rs.getInt(10), rs.getString(11));
 			methods.add(method);
 		}
 
@@ -158,18 +158,18 @@ public class SQLite {
 		return methods;
 	}
 
-	public double getCoverage(String id) throws ClassNotFoundException, SQLException{
+	public double getCoverage(String id) throws ClassNotFoundException, SQLException {
 		Class.forName("org.sqlite.JDBC");
 		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
 		statement = connection.createStatement();
 
-		final String sql = "select * from " + table + " where id="+id;
+		final String sql = "select * from " + table + " where id=" + id;
 		final ResultSet rs = statement.executeQuery(sql);
 		final double coverage;
-		if(rs.next())
+		if (rs.next())
 			coverage = rs.getDouble(2);
 		else
-			coverage=-1;
+			coverage = -1;
 		try {
 			if (statement != null) {
 				statement.close();
@@ -187,18 +187,18 @@ public class SQLite {
 		return coverage;
 	}
 
-	public double getBranchCoverage(String id) throws ClassNotFoundException, SQLException{
+	public double getBranchCoverage(String id) throws ClassNotFoundException, SQLException {
 		Class.forName("org.sqlite.JDBC");
 		connection = DriverManager.getConnection("jdbc:sqlite:sqlite/" + db);
 		statement = connection.createStatement();
 
-		final String sql = "select * from " + table + " where id="+id;
+		final String sql = "select * from " + table + " where id=" + id;
 		final ResultSet rs = statement.executeQuery(sql);
 		final double branchCoverage;
-		if(rs.next())
+		if (rs.next())
 			branchCoverage = rs.getDouble(3);
 		else
-			branchCoverage=-1;
+			branchCoverage = -1;
 		try {
 			if (statement != null) {
 				statement.close();

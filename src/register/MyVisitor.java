@@ -9,10 +9,12 @@ import java.util.List;
 import org.apache.commons.codec.binary.Hex;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Statement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -33,6 +35,8 @@ public class MyVisitor extends ASTVisitor {
 	private String projectName;
 	private int startLine;
 	private int endLine;
+	private int statementNumber = 0;
+	private boolean countingFlag = false;
 
 	private String sourceCode;
 
@@ -119,6 +123,14 @@ public class MyVisitor extends ASTVisitor {
 		this.sourceCode = sourceCode;
 	}
 
+	public int getStatementNumber() {
+		return statementNumber;
+	}
+
+	public void setStatementNumber(int statementNumber) {
+		this.statementNumber = statementNumber;
+	}
+
 	/******************************************************************/
 
 	/*
@@ -136,11 +148,14 @@ public class MyVisitor extends ASTVisitor {
 	}
 
 	/*
-	 * メソッドのシグネチャ情報を取得
+	 * *メソッドのシグネチャ情報を取得
 	 */
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (!node.isConstructor() && node.getReturnType2() != null) { // コンストラクタ，ENUM宣言は無視する．
+			countingFlag=true;
+
+			countingFlag=false;
 			TypeDeclaration parent = getParentTypeDeclaration(node);
 			setClassName(getFQName(parent));
 			setStartLine(unit.getLineNumber(node.getStartPosition() - 1));
@@ -165,6 +180,21 @@ public class MyVisitor extends ASTVisitor {
 			} catch (ClassNotFoundException | SQLException e) {
 				e.printStackTrace();
 			}
+			statementNumber = 0;
+		}
+		return true;
+	}
+
+	/**
+	 * ステートメントの数をカウントする
+	 * @param node
+	 * @return
+	 */
+	@Override
+	public boolean visit(Block node) {
+		if (countingFlag) {
+			List<Statement> statements = node.statements();
+			statementNumber += statements.size();
 		}
 		return true;
 	}
@@ -278,5 +308,12 @@ public class MyVisitor extends ASTVisitor {
 
 		}
 		return isInner;
+	}
+
+	public void countStatementNumber(MethodDeclaration node) {
+		Block block = node.getBody();
+		List<Statement> statements = block.statements();
+		statementNumber+=statements.size();
+
 	}
 }

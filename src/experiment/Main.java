@@ -37,7 +37,10 @@ public class Main {
 	static Properties properties = new Properties();
 
 	public static void main(String[] args) throws Exception {
-		//initialize();
+		final InputStream pinput = new FileInputStream(new File("experiment.properties"));
+		properties.load(pinput);
+		pinput.close();
+		initialize();
 		execute(args);
 
 	}
@@ -48,9 +51,6 @@ public class Main {
 		fh.setFormatter(new java.util.logging.SimpleFormatter());
 		logger.addHandler(fh);
 
-		final InputStream pinput = new FileInputStream(new File("experiment.properties"));
-		properties.load(pinput);
-		pinput.close();
 
 		/* 進化させるメソッドを取得 */
 		final int limit = Integer.parseInt(properties.getProperty("limit"));
@@ -69,7 +69,7 @@ public class Main {
 			String targetJavaFileName = new File(targetMethod.getFilePath()).getName();
 			String targetClassName = FilenameUtils.removeExtension(targetJavaFileName);
 			String projectJarFileName = properties.getProperty("projectJarFileName");
-			String dependencies = properties.getProperty("dependecies");
+			String dependencies = properties.getProperty("dependencies");
 			String[] targetArgs = { "-r", targetMethod.getReturnType(), "-p", targetMethod.getParameterType(), "-m",
 					targetMethod.getMethodName(), "-P", properties.getProperty("targetProject") };
 			List<MethodInfo> evolvedMethods = search.execute(targetArgs);
@@ -79,8 +79,10 @@ public class Main {
 			Transformation trans = new Transformation();
 			Controller ctr = new Controller();
 			for (MethodInfo evMethod : evolvedMethods) {
-				if (targetMethod.equals(evMethod) || !isCoverage100(evMethod) || !isBranchCoverage100(evMethod))
-					continue;
+				if (targetMethod.equals(evMethod))
+						continue;
+				/*if (targetMethod.equals(evMethod) || !isCoverage100(evMethod) || !isBranchCoverage100(evMethod))
+					continue;*/
 				TestCaseInfo testcase = new TestCaseInfo(targetMethod);
 				System.out.println("target: " + targetMethod.getClassName() + ", " + targetMethod.getMethodName());
 				System.out.println("evoleved: " + evMethod.getClassName() + ", " + evMethod.getMethodName());
@@ -225,7 +227,8 @@ public class Main {
 			throws IOException, InterruptedException, ClassNotFoundException {
 		boolean failed = false;
 		String[] dependencies = properties.getProperty("dependencies").split(";", -1);
-		List<String> classFileNameList = Arrays.asList(dependencies);
+		List<String> classFileNameList = new ArrayList<>();
+		classFileNameList.addAll(Arrays.asList(dependencies));
 		classFileNameList.add(properties.getProperty("targetclassDir"));
 		classFileNameList.add(properties.getProperty("targettestclassDir"));
 		String[] classFileName = (String[]) classFileNameList.toArray(new String[0]);

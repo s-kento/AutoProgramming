@@ -17,10 +17,11 @@ public class MethodInfo {
 	private int startLine;
 	private int endLine;
 	private String sourceCode;
+	private int statementNumber;
 
 
 	MethodInfo(int id, String filePath, String className, String methodName, String returnType, String parameterType,
-			String projectName, int startLine, int endLine, String sourceCode) throws DecoderException {
+			String projectName, int startLine, int endLine, int statementNumber, String sourceCode) throws DecoderException {
 		setId(id);
 		setFilePath(filePath);
 		setClassName(className);
@@ -31,6 +32,15 @@ public class MethodInfo {
 		setStartLine(startLine);
 		setEndLine(endLine);
 		setSourceCode(sourceCode);
+		setStatementNumber(statementNumber);
+	}
+
+	public int getStatementNumber() {
+		return statementNumber;
+	}
+
+	public void setStatementNumber(int statementNumber) {
+		this.statementNumber = statementNumber;
 	}
 
 	public int getId() {
@@ -121,12 +131,12 @@ public class MethodInfo {
 
 	public boolean equals(MethodInfo method){
 		boolean equal = false;
-		if(getFilePath().equals(method.getFilePath()) && getStartLine()==method.getStartLine())
+		if(getProjectName().equals(method.getProjectName()) && getId()==method.getId())
 			equal=true;
 		return equal;
 	}
 
 	public int hashCode(){
-		return getFilePath().hashCode()+getStartLine();
+		return getProjectName().hashCode()+getId();
 	}
 }
