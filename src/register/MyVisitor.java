@@ -153,9 +153,9 @@ public class MyVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (!node.isConstructor() && node.getReturnType2() != null) { // コンストラクタ，ENUM宣言は無視する．
-			countingFlag=true;
-
-			countingFlag=false;
+			CountStatementVisitor csVisitor = new CountStatementVisitor();
+			node.accept(csVisitor);
+			setStatementNumber(csVisitor.getStatementNumber());
 			TypeDeclaration parent = getParentTypeDeclaration(node);
 			setClassName(getFQName(parent));
 			setStartLine(unit.getLineNumber(node.getStartPosition() - 1));
