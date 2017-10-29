@@ -1,6 +1,6 @@
 package transformation;
 
-import fr.inria.main.evolution.*;
+import fr.inria.main.evolution.AstorMain;
 import search.MethodInfo;
 
 public class GenProg {
@@ -14,8 +14,9 @@ public class GenProg {
 		astor.execute(args);
 	}
 
-	public void execute(String[] args,MethodInfo targetMethod) throws Exception {
-		AstorMain astor = new AstorMain(targetMethod);
+	public void execute(String[] args, MethodInfo targetMethod) throws Exception {
+		AstorMain astor = new AstorMain(targetMethod.getClassName(), targetMethod.getMethodName(),
+				targetMethod.getStartLine(), targetMethod.getEndLine());
 		astor.execute(args);
 	}
 }

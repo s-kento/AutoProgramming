@@ -79,7 +79,7 @@ public class Main {
 			Transformation trans = new Transformation();
 			Controller ctr = new Controller();
 			for (MethodInfo evMethod : evolvedMethods) {
-				if (targetMethod.equals(evMethod) || evMethod.getStatementNumber()==1)
+				if (targetMethod.equals(evMethod) || evMethod.getStatementNumber()<=1)
 						continue;
 				/*if (targetMethod.equals(evMethod) || !isCoverage100(evMethod) || !isBranchCoverage100(evMethod))
 					continue;*/
