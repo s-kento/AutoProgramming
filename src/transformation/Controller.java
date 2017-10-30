@@ -160,9 +160,13 @@ public class Controller {
 	 *            jarファイル名
 	 * @return adjusted 拡張子付きのファイル名
 	 */
-	/*
-	 * public String adjustJarFileName(String original){ String adjusted; if(new
-	 * File(original).getPath().endsWith(".jar")){ adjusted=original; }else{
-	 * adjusted=original+".jar"; } return adjusted; }
-	 */
+	/*public String adjustJarFileName(String original){
+		String adjusted;
+		if(new File(original).getPath().endsWith(".jar")){
+			adjusted=original;
+		}else{
+			adjusted=original+".jar";
+		}
+		return adjusted;
+	}*/
 }
