@@ -27,7 +27,8 @@ public class Controller {
 	/**
 	 * jarファイルから指定したjavaファイルを抽出する
 	 *
-	 * @param fileName 抽出したいJavaファイル
+	 * @param fileName
+	 *            抽出したいJavaファイル
 	 */
 	public void extractJavaFile(String jarFileName, String javaFileName) {
 		File file = new File("work\\" + jarFileName);
@@ -41,20 +42,22 @@ public class Controller {
 	/**
 	 * jarファイルからエントリを抽出し，文字列として読み込んで新規ファイルに書き込む
 	 *
-	 * @param zipFile jarファイル
+	 * @param zipFile
+	 *            jarファイル
 	 *
-	 * @param name 抽出したいJavaファイル
+	 * @param name
+	 *            抽出したいJavaファイル
 	 */
 	private void printFile(ZipFile zipFile, String name) throws IOException {
 		File file = new File("work\\" + name);
 		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
-		ZipEntry ze=null;
+		ZipEntry ze = null;
 		Enumeration<? extends ZipEntry> entries = zipFile.entries();
 		while (entries.hasMoreElements()) {
-		     ze = entries.nextElement();
-		    if (new File(ze.getName()).getName().equals(name)) {
-		        break;
-		    }
+			ze = entries.nextElement();
+			if (new File(ze.getName()).getName().equals(name)) {
+				break;
+			}
 		}
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(ze)))) {
 			for (;;) {
@@ -62,7 +65,7 @@ public class Controller {
 				if (text == null) {
 					break;
 				}
-				//System.out.println(text);
+				// System.out.println(text);
 				pw.println(text);
 			}
 		}
@@ -72,16 +75,18 @@ public class Controller {
 	/**
 	 * 書き換えたメソッドを含むjavaファイルをコンパイルし，クラスファイルを生成する
 	 *
-	 * @param jarFileName プロジェクトのjarファイル名
+	 * @param jarFileName
+	 *            プロジェクトのjarファイル名
 	 *
-	 * @param javaFileName コンパイルしたいJavaファイル名
+	 * @param javaFileName
+	 *            コンパイルしたいJavaファイル名
 	 *
 	 * @return r 0ならコンパイル成功
+	 * @throws MalformedURLException
 	 */
 	public int compile(String jarFileName, String javaFileName) {
 		File src = new File("work\\" + javaFileName);
-		String[] args = { "-classpath", jarFileName,
-				src.getAbsolutePath() };
+		String[] args = { "-classpath", jarFileName, src.getAbsolutePath() };
 		JavaCompiler c = ToolProvider.getSystemJavaCompiler();
 		int r = c.run(null, null, null, args);
 		return r;
@@ -89,13 +94,21 @@ public class Controller {
 
 	/**
 	 * メソッドを実行する
-	 * @param jarFileName jarファイル名
-	 * @param javaFileName javaファイル名
-	 * @param packageName パッケージ名
-	 * @param className クラス名
-	 * @param methodName メソッド名
-	 * @param parameterName 引数の型
-	 * @param args メソッドの引数
+	 *
+	 * @param jarFileName
+	 *            jarファイル名
+	 * @param javaFileName
+	 *            javaファイル名
+	 * @param packageName
+	 *            パッケージ名
+	 * @param className
+	 *            クラス名
+	 * @param methodName
+	 *            メソッド名
+	 * @param parameterName
+	 *            引数の型
+	 * @param args
+	 *            メソッドの引数
 	 * @return r メソッドの戻り値
 	 */
 	public Object run(String jarFileName, String javaFileName, String packageName, String className, String methodName,
@@ -108,7 +121,7 @@ public class Controller {
 			load = URLClassLoader.newInstance(new URL[] { file1.toURI().toURL(), file2.toURI().toURL() });
 			Class cl;
 			cl = load.loadClass(packageName + "." + className);
-			Method method = cl.getMethod(methodName,analyzeType(parameterName));
+			Method method = cl.getMethod(methodName, analyzeType(parameterName));
 			r = method.invoke(cl.newInstance(), args);
 		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException | IllegalAccessException
 				| IllegalArgumentException | InvocationTargetException | InstantiationException
@@ -120,17 +133,19 @@ public class Controller {
 
 	/**
 	 * カンマ区切りの型名から，Classクラスの配列を返す
-	 * @param parameterTypes 引数の型，カンマ区切り
+	 *
+	 * @param parameterTypes
+	 *            引数の型，カンマ区切り
 	 * @return classes Classクラスの配列
 	 */
-	public Class<?>[] analyzeType(String parameterTypes){
-		if(parameterTypes.equals("null"))
+	public Class<?>[] analyzeType(String parameterTypes) {
+		if (parameterTypes.equals("null"))
 			return null;
-		String[] types=parameterTypes.split(",",0);
+		String[] types = parameterTypes.split(",", 0);
 		Class<?>[] classes = new Class<?>[types.length];
-		for(int i=0;i<types.length;i++){
+		for (int i = 0; i < types.length; i++) {
 			try {
-				classes[i]=Class.forName(types[i]);
+				classes[i] = Class.forName(types[i]);
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -140,16 +155,14 @@ public class Controller {
 
 	/**
 	 * ファイル名に.jarがついてなければつける
-	 * @param original jarファイル名
+	 *
+	 * @param original
+	 *            jarファイル名
 	 * @return adjusted 拡張子付きのファイル名
 	 */
-	/*public String adjustJarFileName(String original){
-		String adjusted;
-		if(new File(original).getPath().endsWith(".jar")){
-			adjusted=original;
-		}else{
-			adjusted=original+".jar";
-		}
-		return adjusted;
-	}*/
+	/*
+	 * public String adjustJarFileName(String original){ String adjusted; if(new
+	 * File(original).getPath().endsWith(".jar")){ adjusted=original; }else{
+	 * adjusted=original+".jar"; } return adjusted; }
+	 */
 }
