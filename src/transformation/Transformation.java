@@ -27,24 +27,19 @@ public class Transformation {
 	}
 
 	public void execute(String[] args) throws Exception {
-		GenProg gen = new GenProg();
-		/*
-		 * String[] arguments = { "-location", "./commons-text-1.0", "-mode",
-		 * "jgenprog", "-scope", "global", "-failing",
-		 * "org.apache.commons.text.StrBuilderTest", "-srcjavafolder",
-		 * "/src/main/java/", "-srctestfolder", "/src/test/", "-binjavafolder",
-		 * "/target/classes", "-bintestfolder", "/target/test-classes",
-		 * "-flthreshold", "0.5", "-seed", "4", "-maxtime", "100", "-stopfirst",
-		 * "true", "-dependencies",
-		 * "./commons-text-1.0/lib/hamcrest-all-1.3.jar:./commons-text-1.0/lib/hamcrest-core-1.3.jar;./commons-text-1.0/lib/junit-4.12.jar;./commons-text-1.0/lib/commons-lang3.jar"
-		 * };
-		 */
-		gen.execute(args);
+		GenProg gen = new GenProg(args);
+		gen.start();
+		gen.join(1800000);
+		if(gen.isAlive())
+			gen.stop();
 	}
 
 	public void execute(String[] args, MethodInfo targetMethod) throws Exception {
-		GenProg gen = new GenProg();
-		gen.execute(args, targetMethod);
+		GenProg gen = new GenProg(args, targetMethod);
+		gen.start();
+		gen.join(1800000);
+		if(gen.isAlive())
+			gen.stop();
 	}
 
 	/**
