@@ -32,30 +32,19 @@ import search.Search;
 import transformation.Controller;
 import transformation.Transformation;
 
-public class Main {
+public class MethodGenerator {
 
 	static Properties properties = new Properties();
+	static Logger logger;
 
-	public static void main(String[] args) throws Exception {
-		final InputStream pinput = new FileInputStream(new File("experiment.properties"));
-		properties.load(pinput);
-		pinput.close();
+	public void execute(String[] args) throws Exception {
+		loadProperty("experiment.properties");
 		initialize();
-		execute(args);
-
-	}
-
-	public static void execute(String[] args) throws Exception {
-		final Logger logger = Logger.getLogger("ExperimetLogging");
-		FileHandler fh = new FileHandler("ExperimentLog.log", true);
-		fh.setFormatter(new java.util.logging.SimpleFormatter());
-		logger.addHandler(fh);
+		setLogger("ExperimentLog");
 
 
 		/* 進化させるメソッドを取得 */
-		final int limit = Integer.parseInt(properties.getProperty("limit"));
 		final int startId = Integer.parseInt(properties.getProperty("startId"));
-		int num = 0;
 		Search search = new Search();
 		List<MethodInfo> methods = search.execute(args);//idの昇順で並んでいる
 		splitList(methods, startId);
@@ -112,7 +101,7 @@ public class Main {
 								false);
 					}
 					TestCaseRunnerThread th = new TestCaseRunnerThread(targetClassName,
-							Main.toPackageName(targetAbsClassName), testcase);
+							toPackageName(targetAbsClassName), testcase);
 					th.start();
 					th.join(60000);
 					if (th.isAlive()) {
@@ -130,7 +119,6 @@ public class Main {
 								"./outputMutation_" + targetMethod.getId() };
 						trans.execute(arguments, targetMethod);
 						logger.info("GenProg終了");
-						num++;
 					}
 					TestCaseChecker.untaihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
 				}
@@ -139,8 +127,6 @@ public class Main {
 					break;
 				}
 			}
-			/*if (num >= limit)
-				break;*/
 		}
 	}
 
@@ -149,7 +135,7 @@ public class Main {
 	 *
 	 * @throws IOException
 	 */
-	public static void initialize() throws IOException {
+	public void initialize() throws IOException {
 		System.out.println("initializing working directory...");
 		File dir = new File(properties.getProperty("targetDir"));
 		if (dir.exists())
@@ -166,12 +152,12 @@ public class Main {
 
 	/**
 	 * 絶対クラス名から，パッケージのパスを得る
-	 *
+	 * org.apche.commons.text.StrBuilder -> org\apache\commons\text
 	 * @param absClassName
 	 *            絶対クラス名
 	 * @return directoryName パス
 	 */
-	public static String toDirectoryName(String absClassName) {
+	public String toDirectoryName(String absClassName) {
 		int index = absClassName.lastIndexOf(".");
 		String packageName = absClassName.substring(0, index);
 		String regex = "\\.";
@@ -181,7 +167,13 @@ public class Main {
 		return directoryName;
 	}
 
-	public static String toPackageName(String absClassName) {
+	/**
+	 * 絶対クラス名からパッケージ名を得る
+	 * org.apche.commons.text.StrBuilder -> org.apche.commons.text
+	 * @param absClassName
+	 * @return packageName
+	 */
+	public String toPackageName(String absClassName) {
 		int index = absClassName.lastIndexOf(".");
 		String packageName = absClassName.substring(0, index);
 		return packageName;
@@ -192,7 +184,7 @@ public class Main {
 	 *
 	 * @param filePath
 	 */
-	public static void deleteFile(String filePath) {
+	public void deleteFile(String filePath) {
 		File file = new File(filePath);
 		if (file.exists())
 			file.delete();
@@ -205,7 +197,7 @@ public class Main {
 	 * @param packagePath
 	 * @return exists
 	 */
-	public static boolean existsTestFile(String className, String packagePath) {
+	public boolean existsTestFile(String className, String packagePath) {
 		boolean exists = false;
 		File file = new File(properties.getProperty("targettestDir") + packagePath + "\\" + className + "Test.java");
 		if (file.exists())
@@ -223,7 +215,7 @@ public class Main {
 	 * @throws InterruptedException
 	 * @throws ClassNotFoundException
 	 */
-	public static boolean testFailed(String className, String packageName)
+	public boolean testFailed(String className, String packageName)
 			throws IOException, InterruptedException, ClassNotFoundException {
 		boolean failed = false;
 		String[] dependencies = properties.getProperty("dependencies").split(";", -1);
@@ -251,7 +243,7 @@ public class Main {
 		return failed;
 	}
 
-	public static void printInputStream(InputStream is) throws IOException {
+	public void printInputStream(InputStream is) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(is, "ms932"));
 		try {
 			for (;;) {
@@ -265,7 +257,12 @@ public class Main {
 		}
 	}
 
-	public static boolean isSuccess(MethodInfo targetMethod) {
+	/**
+	 * メソッドの自動生成が成功したかどうか
+	 * @param targetMethod
+	 * @return success
+	 */
+	public boolean isSuccess(MethodInfo targetMethod) {
 		boolean success = false;
 		File[] output = new File("outputMutation_" + targetMethod.getId() + "\\AstorMain-"
 				+ properties.getProperty("targetProject") + "\\src")
@@ -277,7 +274,14 @@ public class Main {
 		return success;
 	}
 
-	public static boolean isCoverage100(MethodInfo targetMethod) throws ClassNotFoundException, SQLException {
+	/**
+	 * メソッドの命令カバレッジが100%かどうか
+	 * @param targetMethod
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public boolean isCoverage100(MethodInfo targetMethod) throws ClassNotFoundException, SQLException {
 		SQLite sqLite = new SQLite(null, "coverages");
 		final double coverage;
 		coverage = sqLite.getCoverage(String.valueOf(targetMethod.getId()));
@@ -287,7 +291,14 @@ public class Main {
 			return false;
 	}
 
-	public static boolean isBranchCoverage100(MethodInfo targetMethod) throws ClassNotFoundException, SQLException {
+	/**
+	 * メソッドのブランチカバレッジが100%かどうか
+	 * @param targetMethod
+	 * @return
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public boolean isBranchCoverage100(MethodInfo targetMethod) throws ClassNotFoundException, SQLException {
 		SQLite sqLite = new SQLite(null, "coverages");
 		final double branchCoverage;
 		branchCoverage = sqLite.getBranchCoverage(String.valueOf(targetMethod.getId()));
@@ -303,7 +314,7 @@ public class Main {
 	 * @param methods
 	 * @param startId
 	 */
-	public static void splitList(List<MethodInfo> methods, int startId) {
+	public void splitList(List<MethodInfo> methods, int startId) {
 		Iterator<MethodInfo> it = methods.iterator();
 		while (it.hasNext()) {
 			MethodInfo method = it.next();
@@ -312,6 +323,30 @@ public class Main {
 			else
 				it.remove();
 		}
+	}
+
+	/**
+	 * プロパティファイルを読み込む
+	 * @param propertyFileName
+	 * @throws IOException
+	 */
+	public void loadProperty(String propertyFileName) throws IOException{
+		final InputStream pinput = new FileInputStream(new File(propertyFileName));
+		properties.load(pinput);
+		pinput.close();
+	}
+
+	/**
+	 * ログファイルの作成
+	 * @param logFileName
+	 * @throws SecurityException
+	 * @throws IOException
+	 */
+	public void setLogger(String logFileName) throws SecurityException, IOException{
+		logger = Logger.getLogger(logFileName);
+		FileHandler fh = new FileHandler(logFileName+".log", true);
+		fh.setFormatter(new java.util.logging.SimpleFormatter());
+		logger.addHandler(fh);
 	}
 
 }

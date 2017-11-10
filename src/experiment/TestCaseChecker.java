@@ -36,7 +36,8 @@ public class TestCaseChecker {
 				+ "work\\jmh-core-1.13.jar;work\\jmh-generator-annprocess-1.13.jar;work\\junit-4.11.jar;"
 				+ "work\\commons-numbers-fraction-1.0-SNAPSHOT.jar;work\\commons-rng-core-1.0.jar;work\\jopt-simple-4.6.jar;"
 				+ "work\\commons-math3-3.2.jar;work\\hamcrest-core-1.3.jar;work\\commons-numbers-combinatorics-1.0-SNAPSHOT.jar";
-		Main.initialize();
+		MethodGenerator mg = new MethodGenerator();
+		mg.initialize();
 		File file = new File("TestCaseInfo.txt");
 		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(file)));
 		pw.println("FilePath, MethodName, startLine, testClassName, sameSignatureNumber, hasTestCase");
@@ -45,8 +46,8 @@ public class TestCaseChecker {
 			count++;
 			System.out.println(methods.size() + "個のメソッド中" + count + "目を実行");
 			targetAbsClassName = targetMethod.getClassName();
-			dstsrcDir = new File("work\\commons-math\\src\\main\\java\\" + Main.toDirectoryName(targetAbsClassName));
-			dstclassDir = new File("work\\commons-math\\target\\classes\\" + Main.toDirectoryName(targetAbsClassName));
+			dstsrcDir = new File("work\\commons-math\\src\\main\\java\\" + mg.toDirectoryName(targetAbsClassName));
+			dstclassDir = new File("work\\commons-math\\target\\classes\\" + mg.toDirectoryName(targetAbsClassName));
 			targetJavaFileName = new File(targetMethod.getFilePath()).getName();
 			targetClassName = FilenameUtils.removeExtension(targetJavaFileName);
 			TestCaseInfo testcase = new TestCaseInfo(targetMethod);
@@ -54,7 +55,7 @@ public class TestCaseChecker {
 					targetMethod.getMethodName(), "-P", "commons-math" };
 			List<MethodInfo> evolvedMethods = search.execute(argument);
 			testcase.setSigNumber(evolvedMethods.size() - 1);
-			if (!Main.existsTestFile(getClassName(targetMethod), Main.toDirectoryName(targetMethod.getClassName()))
+			if (!mg.existsTestFile(getClassName(targetMethod), mg.toDirectoryName(targetMethod.getClassName()))
 					|| testcase.getSigNumber() == 0) {
 				writeTestCaseInfo(testcase, pw);
 				continue;
@@ -71,7 +72,7 @@ public class TestCaseChecker {
 					filewriter.close();
 					int r = ctr.compile(projectJarFileName + ";" + dependencies, targetJavaFileName);
 					if (r != 0) {
-						Main.deleteFile(targetJavaFile.getAbsolutePath());
+						mg.deleteFile(targetJavaFile.getAbsolutePath());
 						continue;
 					} else {// コンパイル成功
 						File[] files = new File(".\\work").listFiles();
@@ -88,7 +89,7 @@ public class TestCaseChecker {
 						}
 
 						TestCaseRunnerThread th = new TestCaseRunnerThread(targetClassName,
-								Main.toPackageName(targetAbsClassName), testcase);
+								mg.toPackageName(targetAbsClassName), testcase);
 						th.start();
 						th.join(60000);
 						if (th.isAlive()) {
@@ -126,7 +127,8 @@ public class TestCaseChecker {
 	 */
 	public static String getPackageName(MethodInfo method) {
 		String absClassName = method.getClassName();
-		String packageName = Main.toPackageName(absClassName);
+		MethodGenerator mg = new MethodGenerator();
+		String packageName = mg.toPackageName(absClassName);
 		return packageName;
 	}
 
@@ -176,13 +178,14 @@ public class TestCaseChecker {
 			List<String> targetClassFileNames) {
 		File original = new File(dstsrcDir.getAbsolutePath() + "\\" + targetJavaFileName);
 		File taihi = new File(dstsrcDir.getAbsolutePath() + "\\" + targetJavaFileName + ".taihi");
-		Main.deleteFile(original.getAbsolutePath());
+		MethodGenerator mg = new MethodGenerator();
+		mg.deleteFile(original.getAbsolutePath());
 		taihi.renameTo(original);
 
 		for (String targetClassFileName : targetClassFileNames) {
 			original = new File(dstclassDir.getAbsolutePath() + "\\" + targetClassFileName);
 			taihi = new File(dstclassDir.getAbsolutePath() + "\\" + targetClassFileName + ".taihi");
-			Main.deleteFile(original.getAbsolutePath());
+			mg.deleteFile(original.getAbsolutePath());
 			taihi.renameTo(original);
 		}
 

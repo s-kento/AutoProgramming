@@ -19,6 +19,7 @@ import transformation.Transformation;
 public class CompileChecker {
 	public static void main(String[] args)
 			throws ClassNotFoundException, SQLException, ParseException, DecoderException, IOException {
+		MethodGenerator mg = new MethodGenerator();
 		Search search = new Search();
 		List<MethodInfo> methods = search.execute(args);
 		String targetJavaFileName;
@@ -55,11 +56,11 @@ public class CompileChecker {
 				filewriter.close();
 				int r = ctr.compile(projectJarFileName + ";" + dependencies, targetJavaFileName);
 				if (r != 0) {
-					Main.deleteFile(targetJavaFile.getAbsolutePath());
+					mg.deleteFile(targetJavaFile.getAbsolutePath());
 					continue;
 				} else {
 					ccn++;
-					Main.deleteFile(targetJavaFile.getAbsolutePath());
+					mg.deleteFile(targetJavaFile.getAbsolutePath());
 				}
 			}
 

@@ -1,7 +1,6 @@
 package experiment;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class TestCaseRunnerThread extends Thread {
 	String className;
@@ -16,7 +15,8 @@ public class TestCaseRunnerThread extends Thread {
 
 	public void run() {
 		try {
-			if (Main.testFailed(className, packageName)) {
+			MethodGenerator mg = new MethodGenerator();
+			if (mg.testFailed(className, packageName)) {
 				testcase.setTestCase(true);
 			}
 		} catch (ClassNotFoundException | IOException | InterruptedException e) {
