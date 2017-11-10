@@ -37,16 +37,20 @@ public class MethodGenerator {
 	static Properties properties = new Properties();
 	static Logger logger;
 
+	public static void main(String[] args) throws Exception {
+		MethodGenerator mg = new MethodGenerator();
+		mg.execute(args);
+	}
+
 	public void execute(String[] args) throws Exception {
 		loadProperty("experiment.properties");
 		initialize();
 		setLogger("ExperimentLog");
 
-
 		/* 進化させるメソッドを取得 */
 		final int startId = Integer.parseInt(properties.getProperty("startId"));
 		Search search = new Search();
-		List<MethodInfo> methods = search.execute(args);//idの昇順で並んでいる
+		List<MethodInfo> methods = search.execute(args);// idの昇順で並んでいる
 		splitList(methods, startId);
 		for (MethodInfo targetMethod : methods) {
 			if (!isCoverage100(targetMethod) || !isBranchCoverage100(targetMethod))
@@ -68,10 +72,13 @@ public class MethodGenerator {
 			Transformation trans = new Transformation();
 			Controller ctr = new Controller();
 			for (MethodInfo evMethod : evolvedMethods) {
-				if (targetMethod.equals(evMethod) || evMethod.getStatementNumber()<=1)
-						continue;
-				/*if (targetMethod.equals(evMethod) || !isCoverage100(evMethod) || !isBranchCoverage100(evMethod))
-					continue;*/
+				if (targetMethod.equals(evMethod) || evMethod.getStatementNumber() <= 1
+						|| !isSameClass(targetMethod, evMethod))
+					continue;
+				/*
+				 * if (targetMethod.equals(evMethod) || !isCoverage100(evMethod)
+				 * || !isBranchCoverage100(evMethod)) continue;
+				 */
 				TestCaseInfo testcase = new TestCaseInfo(targetMethod);
 				System.out.println("target: " + targetMethod.getClassName() + ", " + targetMethod.getMethodName());
 				System.out.println("evoleved: " + evMethod.getClassName() + ", " + evMethod.getMethodName());
@@ -110,11 +117,10 @@ public class MethodGenerator {
 					if (testcase.existsTestCase()) {
 						logger.info("テストケース成功．GenProg起動");
 						String[] arguments = { "-location", properties.getProperty("location"), "-mode", "jgenprog",
-								"-scope",
-								"global", "-failing", targetAbsClassName + "Test", "-srcjavafolder", "/src/main/java/",
-								"-srctestfolder", "/src/test/", "-binjavafolder", "/target/classes", "-bintestfolder",
-								"/target/test-classes", "-flthreshold", "0.5", "-seed", properties.getProperty("seed"),
-								"-maxtime", properties.getProperty("maxtime"),
+								"-scope", properties.getProperty("scope"), "-failing", targetAbsClassName + "Test", "-srcjavafolder",
+								"/src/main/java/", "-srctestfolder", "/src/test/", "-binjavafolder", "/target/classes",
+								"-bintestfolder", "/target/test-classes", "-flthreshold", "0.5", "-seed",
+								properties.getProperty("seed"), "-maxtime", properties.getProperty("maxtime"),
 								"-stopfirst", "true", "-dependencies", dependencies, "-out",
 								"./outputMutation_" + targetMethod.getId() };
 						trans.execute(arguments, targetMethod);
@@ -151,8 +157,9 @@ public class MethodGenerator {
 	}
 
 	/**
-	 * 絶対クラス名から，パッケージのパスを得る
-	 * org.apche.commons.text.StrBuilder -> org\apache\commons\text
+	 * 絶対クラス名から，パッケージのパスを得る org.apche.commons.text.StrBuilder ->
+	 * org\apache\commons\text
+	 *
 	 * @param absClassName
 	 *            絶対クラス名
 	 * @return directoryName パス
@@ -168,8 +175,9 @@ public class MethodGenerator {
 	}
 
 	/**
-	 * 絶対クラス名からパッケージ名を得る
-	 * org.apche.commons.text.StrBuilder -> org.apche.commons.text
+	 * 絶対クラス名からパッケージ名を得る org.apche.commons.text.StrBuilder ->
+	 * org.apche.commons.text
+	 *
 	 * @param absClassName
 	 * @return packageName
 	 */
@@ -259,14 +267,14 @@ public class MethodGenerator {
 
 	/**
 	 * メソッドの自動生成が成功したかどうか
+	 *
 	 * @param targetMethod
 	 * @return success
 	 */
 	public boolean isSuccess(MethodInfo targetMethod) {
 		boolean success = false;
 		File[] output = new File("outputMutation_" + targetMethod.getId() + "\\AstorMain-"
-				+ properties.getProperty("targetProject") + "\\src")
-						.listFiles();
+				+ properties.getProperty("targetProject") + "\\src").listFiles();
 		if (null != output) {
 			if (output.length > 1)
 				success = true;
@@ -276,6 +284,7 @@ public class MethodGenerator {
 
 	/**
 	 * メソッドの命令カバレッジが100%かどうか
+	 *
 	 * @param targetMethod
 	 * @return
 	 * @throws ClassNotFoundException
@@ -293,6 +302,7 @@ public class MethodGenerator {
 
 	/**
 	 * メソッドのブランチカバレッジが100%かどうか
+	 *
 	 * @param targetMethod
 	 * @return
 	 * @throws ClassNotFoundException
@@ -309,8 +319,8 @@ public class MethodGenerator {
 	}
 
 	/**
-	 * startIdよりも若いIDのメソッドは切り捨てる
-	 * methodがIDで昇順になっていることが条件
+	 * startIdよりも若いIDのメソッドは切り捨てる methodがIDで昇順になっていることが条件
+	 *
 	 * @param methods
 	 * @param startId
 	 */
@@ -327,10 +337,11 @@ public class MethodGenerator {
 
 	/**
 	 * プロパティファイルを読み込む
+	 *
 	 * @param propertyFileName
 	 * @throws IOException
 	 */
-	public void loadProperty(String propertyFileName) throws IOException{
+	public void loadProperty(String propertyFileName) throws IOException {
 		final InputStream pinput = new FileInputStream(new File(propertyFileName));
 		properties.load(pinput);
 		pinput.close();
@@ -338,15 +349,30 @@ public class MethodGenerator {
 
 	/**
 	 * ログファイルの作成
+	 *
 	 * @param logFileName
 	 * @throws SecurityException
 	 * @throws IOException
 	 */
-	public void setLogger(String logFileName) throws SecurityException, IOException{
+	public void setLogger(String logFileName) throws SecurityException, IOException {
 		logger = Logger.getLogger(logFileName);
-		FileHandler fh = new FileHandler(logFileName+".log", true);
+		FileHandler fh = new FileHandler(logFileName + ".log", true);
 		fh.setFormatter(new java.util.logging.SimpleFormatter());
 		logger.addHandler(fh);
 	}
 
+	/**
+	 * 二つのメソッドが同一クラスかどうか判定する
+	 *
+	 * @param method1
+	 * @param method2
+	 * @return
+	 */
+	public boolean isSameClass(MethodInfo method1, MethodInfo method2) {
+		if (method1.getProjectName().equals(method2.getProjectName())
+				&& method1.getClassName().equals(method2.getClassName()))
+			return true;
+		else
+			return false;
+	}
 }
