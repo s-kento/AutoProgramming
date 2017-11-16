@@ -36,6 +36,7 @@ public class MethodGenerator {
 
 	static Properties properties = new Properties();
 	static Logger logger;
+	static String suffixOfTestClass;
 
 	public static void main(String[] args) throws Exception {
 		MethodGenerator mg = new MethodGenerator();
@@ -117,7 +118,9 @@ public class MethodGenerator {
 					if (testcase.existsTestCase()) {
 						logger.info("テストケース成功．GenProg起動");
 						String[] arguments = { "-location", properties.getProperty("location"), "-mode", "jgenprog",
-								"-scope", properties.getProperty("scope"), "-failing", targetAbsClassName + "Test", "-srcjavafolder",
+								"-scope", properties.getProperty("scope"), "-failing",
+								targetAbsClassName + suffixOfTestClass,
+								"-srcjavafolder",
 								"/src/main/java/", "-srctestfolder", "/src/test/", "-binjavafolder", "/target/classes",
 								"-bintestfolder", "/target/test-classes", "-flthreshold", "0.5", "-seed",
 								properties.getProperty("seed"), "-maxtime", properties.getProperty("maxtime"),
@@ -239,7 +242,14 @@ public class MethodGenerator {
 		}
 		URLClassLoader load;
 		load = URLClassLoader.newInstance(classFilesURL);
-		Class cl = load.loadClass(packageName + "." + className + "Test");
+		Class cl;
+		if (existsTestFile(className, toDirectoryName(packageName + "." + className))) {
+			suffixOfTestClass = "Test";
+			cl = load.loadClass(packageName + "." + className + suffixOfTestClass);
+		} else {
+			suffixOfTestClass = "TestCase";
+			cl = load.loadClass(packageName + "." + className + suffixOfTestClass);//commons-ioの仕様
+		}
 		JUnitCore junit = new JUnitCore();
 		Result result = junit.runClasses(cl);
 		// Result result = junit.run(Computer.serial(), cl);
