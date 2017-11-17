@@ -2,7 +2,7 @@ package experiment;
 
 import java.io.IOException;
 
-public class TestCaseRunnerThread extends Thread {
+public class TestCaseRunnerThread implements Runnable {
 	String className;
 	String packageName;
 	TestCaseInfo testcase;

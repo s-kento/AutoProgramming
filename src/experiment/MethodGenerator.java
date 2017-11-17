@@ -108,8 +108,8 @@ public class MethodGenerator {
 								new File(properties.getProperty("workingDir") + targetClassFileName), dstclassDir,
 								false);
 					}
-					TestCaseRunnerThread th = new TestCaseRunnerThread(targetClassName,
-							toPackageName(targetAbsClassName), testcase);
+					Thread th = new Thread(new TestCaseRunnerThread(targetClassName,
+							toPackageName(targetAbsClassName), testcase));
 					th.start();
 					th.join(60000);
 					if (th.isAlive()) {

@@ -3,7 +3,7 @@ package transformation;
 import fr.inria.main.evolution.AstorMain;
 import search.MethodInfo;
 
-public class GenProg extends Thread {
+public class GenProg implements Runnable {
 	String[] args;
 	MethodInfo targetMethod = null;
 

@@ -88,8 +88,8 @@ public class TestCaseChecker {
 							FileUtils.moveFileToDirectory(new File("work\\" + targetClassFileName), dstclassDir, false);
 						}
 
-						TestCaseRunnerThread th = new TestCaseRunnerThread(targetClassName,
-								mg.toPackageName(targetAbsClassName), testcase);
+						Thread th =new Thread(new TestCaseRunnerThread(targetClassName,
+								mg.toPackageName(targetAbsClassName), testcase));
 						th.start();
 						th.join(60000);
 						if (th.isAlive()) {

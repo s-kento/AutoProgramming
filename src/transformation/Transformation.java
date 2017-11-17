@@ -27,7 +27,7 @@ public class Transformation {
 	}
 
 	public void execute(String[] args) throws Exception {
-		GenProg gen = new GenProg(args);
+		Thread gen =new Thread(new GenProg(args));
 		gen.start();
 		gen.join(1800000);
 		if(gen.isAlive())
@@ -35,7 +35,7 @@ public class Transformation {
 	}
 
 	public void execute(String[] args, MethodInfo targetMethod) throws Exception {
-		GenProg gen = new GenProg(args, targetMethod);
+		Thread gen =new Thread(new GenProg(args, targetMethod));
 		gen.start();
 		gen.join(1800000);
 		if(gen.isAlive())
