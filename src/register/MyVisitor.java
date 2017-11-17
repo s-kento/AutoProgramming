@@ -255,8 +255,10 @@ public class MyVisitor extends ASTVisitor {
 	public String getFQName(Type node) {
 		ITypeBinding itb = node.resolveBinding();
 		String packageName = null;
-		if (itb.getPackage() != null)
-			packageName = itb.getPackage().getName().toString();
+		if (itb != null) {
+			if (itb.getPackage() != null)
+				packageName = itb.getPackage().getName().toString();
+		}
 		String fqName = node.toString();
 		if (packageName != null) {
 			fqName = packageName + "." + fqName;
@@ -313,7 +315,7 @@ public class MyVisitor extends ASTVisitor {
 	public void countStatementNumber(MethodDeclaration node) {
 		Block block = node.getBody();
 		List<Statement> statements = block.statements();
-		statementNumber+=statements.size();
+		statementNumber += statements.size();
 
 	}
 }
