@@ -51,3 +51,19 @@ className=org.apache.commons.text.StrBuilder, methodName=org.apache.commons.text
 							-srctestfolder /src/test/ -binjavafolder /target/classes  -bintestfolder
 							/target/test-classes -flthreshold 0.5  -seed 4 -maxtime 100
 							-stopfirst true -dependencies work/commons-numbers-core-1.0-SNAPSHOT.jar;work/commons-numbers-gamma-1.0-SNAPSHOT.jar;work/commons-numbers-angle-1.0-SNAPSHOT.jar;work/commons-numbers-arrays-1.0-SNAPSHOT.jar;work/commons-rng-client-api-1.0.jar;work/commons-rng-simple-1.0.jar;work/commons-rng-sampling-1.1-SNAPSHOT.jar;work/jmh-core-1.13.jar;work/jmh-generator-annprocess-1.13.jar;work/junit-4.11.jar
+							
+
+astorのjarをコマンドプロンプトから実行するときハマったこと
+・JREではなくJDKを参照すること
+・eclipseからjarを生成するときは，エクスポート→実行可能jar→必須ライブラリを抽出にチェック
+・-dependenciesオプションに，astor*.jarを加えないといけない．でないとGZoltarでエラー発生
+
+nopolでのハマったこと
+・jpfがimportできない→maven repositoryの更新(cf: http://hiisori.jugem.jp/?eid=26)
+・eclipseの実行時にエラー(@DynamicClassCompiler)→Java7ではなくJava8
+
+メモリリークの原因の仮説その1
+https://stackoverflow.com/questions/33548218/memory-leak-in-program-using-compiler-api
+
+nopolが動かなかった原因
+nopolが参照しているspoon-core5.5と，astorが参照しているspoon-core5.4が競合していたため
