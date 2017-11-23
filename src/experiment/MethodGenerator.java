@@ -34,9 +34,6 @@ import transformation.Transformation;
 
 public class MethodGenerator {
 
-	static Properties properties = new Properties();
-	static Logger logger;
-	static String suffixOfTestClass;
 
 	public static void main(String[] args) throws Exception {
 		MethodGenerator mg = new MethodGenerator();
@@ -44,9 +41,12 @@ public class MethodGenerator {
 	}
 
 	public void execute(String[] args) throws Exception {
-		loadProperty("experiment.properties");
-		initialize();
-		setLogger("ExperimentLog");
+		Properties properties = new Properties();
+		Logger logger = null;
+		String suffixOfTestClass=null;
+		loadProperty(properties,"experiment.properties");
+		initialize(properties);
+		setLogger(logger,"ExperimentLog");
 
 		/* 進化させるメソッドを取得 */
 		final int startId = Integer.parseInt(properties.getProperty("startId"));
@@ -101,7 +101,7 @@ public class MethodGenerator {
 							targetClassFileNames.add(file.getName());
 						}
 					}
-					TestCaseChecker.taihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
+					taihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
 					FileUtils.moveFileToDirectory(targetJavaFile, dstsrcDir, false);
 					for (String targetClassFileName : targetClassFileNames) {
 						FileUtils.moveFileToDirectory(
@@ -109,7 +109,7 @@ public class MethodGenerator {
 								false);
 					}
 					Thread th = new Thread(new TestCaseRunnerThread(targetClassName,
-							toPackageName(targetAbsClassName), testcase));
+							toPackageName(targetAbsClassName), testcase,properties,suffixOfTestClass));
 					th.start();
 					th.join(60000);
 					if (th.isAlive()) {
@@ -129,9 +129,9 @@ public class MethodGenerator {
 						trans.execute(arguments, targetMethod);
 						logger.info("GenProg終了");
 					}
-					TestCaseChecker.untaihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
+					untaihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
 				}
-				if (isSuccess(targetMethod)) {
+				if (isSuccess(targetMethod, properties)) {
 					logger.info("メソッドid " + targetMethod.getId() + "の自動生成が成功");
 					break;
 				}
@@ -144,7 +144,7 @@ public class MethodGenerator {
 	 *
 	 * @throws IOException
 	 */
-	public void initialize() throws IOException {
+	public void initialize(Properties properties) throws IOException {
 		System.out.println("initializing working directory...");
 		File dir = new File(properties.getProperty("targetDir"));
 		if (dir.exists())
@@ -208,7 +208,7 @@ public class MethodGenerator {
 	 * @param packagePath
 	 * @return exists
 	 */
-	public boolean existsTestFile(String className, String packagePath) {
+	public boolean existsTestFile(String className, String packagePath, Properties properties) {
 		boolean exists = false;
 		File file = new File(properties.getProperty("targettestDir") + packagePath + "\\" + className + "Test.java");
 		if (file.exists())
@@ -226,7 +226,7 @@ public class MethodGenerator {
 	 * @throws InterruptedException
 	 * @throws ClassNotFoundException
 	 */
-	public boolean testFailed(String className, String packageName)
+	public boolean testFailed(String className, String packageName,Properties properties, String suffixOfTestClass)
 			throws IOException, InterruptedException, ClassNotFoundException {
 		boolean failed = false;
 		String[] dependencies = properties.getProperty("dependencies").split(";", -1);
@@ -243,7 +243,7 @@ public class MethodGenerator {
 		URLClassLoader load;
 		load = URLClassLoader.newInstance(classFilesURL);
 		Class cl;
-		if (existsTestFile(className, toDirectoryName(packageName + "." + className))) {
+		if (existsTestFile(className, toDirectoryName(packageName + "." + className),properties)) {
 			suffixOfTestClass = "Test";
 			cl = load.loadClass(packageName + "." + className + suffixOfTestClass);
 		} else {
@@ -281,7 +281,7 @@ public class MethodGenerator {
 	 * @param targetMethod
 	 * @return success
 	 */
-	public boolean isSuccess(MethodInfo targetMethod) {
+	public boolean isSuccess(MethodInfo targetMethod, Properties properties) {
 		boolean success = false;
 		File[] output = new File("outputMutation_" + targetMethod.getId() + "\\AstorMain-"
 				+ properties.getProperty("targetProject") + "\\src").listFiles();
@@ -351,7 +351,7 @@ public class MethodGenerator {
 	 * @param propertyFileName
 	 * @throws IOException
 	 */
-	public void loadProperty(String propertyFileName) throws IOException {
+	public void loadProperty(Properties properties, String propertyFileName) throws IOException {
 		final InputStream pinput = new FileInputStream(new File(propertyFileName));
 		properties.load(pinput);
 		pinput.close();
@@ -364,11 +364,12 @@ public class MethodGenerator {
 	 * @throws SecurityException
 	 * @throws IOException
 	 */
-	public void setLogger(String logFileName) throws SecurityException, IOException {
+	public Logger setLogger(Logger logger,String logFileName) throws SecurityException, IOException {
 		logger = Logger.getLogger(logFileName);
 		FileHandler fh = new FileHandler(logFileName + ".log", true);
 		fh.setFormatter(new java.util.logging.SimpleFormatter());
 		logger.addHandler(fh);
+		return logger;
 	}
 
 	/**
@@ -384,5 +385,72 @@ public class MethodGenerator {
 			return true;
 		else
 			return false;
+	}
+
+	/**
+	 * MethodInfoからクラス名を取得(パッケージ名なし)
+	 *
+	 * @param method
+	 *            MethodInfo
+	 * @return className クラス名
+	 */
+	public static String getClassName(MethodInfo method) {
+		String javaFileName = new File(method.getFilePath()).getName();
+		String className = FilenameUtils.removeExtension(javaFileName);
+		return className;
+	}
+
+	/**
+	 * MethodInfoからパッケージ名を取得
+	 *
+	 * @param method
+	 *            MethodInfo
+	 * @return packageName パッケージ名
+	 */
+	public static String getPackageName(MethodInfo method) {
+		String absClassName = method.getClassName();
+		MethodGenerator mg = new MethodGenerator();
+		String packageName = mg.toPackageName(absClassName);
+		return packageName;
+	}
+
+	/**
+	 * MethodInfoからファイル名を取得
+	 *
+	 * @param method
+	 *            MethodInfo
+	 * @return fileName
+	 */
+	public static String getFileName(MethodInfo method) {
+		String fileName = new File(method.getFilePath()).getName();
+		return fileName;
+	}
+
+	public void taihi(File dstsrcDir, File dstclassDir, String targetJavaFileName,
+			List<String> targetClassFileNames) {
+		File original = new File(dstsrcDir.getAbsolutePath() + "\\" + targetJavaFileName);
+		File taihi = new File(dstsrcDir.getAbsolutePath() + "\\" + targetJavaFileName + ".taihi");
+		original.renameTo(taihi);
+		for (String targetClassFileName : targetClassFileNames) {
+			original = new File(dstclassDir.getAbsolutePath() + "\\" + targetClassFileName);
+			taihi = new File(dstclassDir.getAbsolutePath() + "\\" + targetClassFileName + ".taihi");
+			original.renameTo(taihi);
+		}
+	}
+
+	public void untaihi(File dstsrcDir, File dstclassDir, String targetJavaFileName,
+			List<String> targetClassFileNames) {
+		File original = new File(dstsrcDir.getAbsolutePath() + "\\" + targetJavaFileName);
+		File taihi = new File(dstsrcDir.getAbsolutePath() + "\\" + targetJavaFileName + ".taihi");
+		deleteFile(original.getAbsolutePath());
+		taihi.renameTo(original);
+
+		for (String targetClassFileName : targetClassFileNames) {
+			original = new File(dstclassDir.getAbsolutePath() + "\\" + targetClassFileName);
+			taihi = new File(dstclassDir.getAbsolutePath() + "\\" + targetClassFileName + ".taihi");
+			deleteFile(original.getAbsolutePath());
+			taihi.renameTo(original);
+		}
+
 	}
 }

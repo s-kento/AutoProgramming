@@ -16,7 +16,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.text.edits.TextEdit;
 
-import experiment.TestCaseChecker;
+import experiment.MethodGenerator;
 import register.SourceFileAnalyzer;
 import search.MethodInfo;
 
@@ -27,18 +27,18 @@ public class Transformation {
 	}
 
 	public void execute(String[] args) throws Exception {
-		Thread gen =new Thread(new GenProg(args));
+		Thread gen = new Thread(new GenProg(args));
 		gen.start();
 		gen.join(1800000);
-		if(gen.isAlive())
+		if (gen.isAlive())
 			gen.stop();
 	}
 
 	public void execute(String[] args, MethodInfo targetMethod) throws Exception {
-		Thread gen =new Thread(new GenProg(args, targetMethod));
+		Thread gen = new Thread(new GenProg(args, targetMethod));
 		gen.start();
 		gen.join(1800000);
-		if(gen.isAlive())
+		if (gen.isAlive())
 			gen.stop();
 	}
 
@@ -164,8 +164,8 @@ public class Transformation {
 		return exist;
 	}
 
-	public void addImport(CompilationUnit unitA, CompilationUnit unitB, MethodInfo methodA, MethodInfo methodB, ASTRewrite rewriter)
-			throws IOException {
+	public void addImport(CompilationUnit unitA, CompilationUnit unitB, MethodInfo methodA, MethodInfo methodB,
+			ASTRewrite rewriter) throws IOException {
 		AST astA = unitA.getAST();
 		ListRewrite lrw = rewriter.getListRewrite(unitA, unitA.IMPORTS_PROPERTY);
 		List<ImportDeclaration> idA = unitA.imports();
@@ -175,13 +175,13 @@ public class Transformation {
 				lrw.insertLast(id, null);
 			}
 		}
-
-		String packageA = TestCaseChecker.getPackageName(methodA);
-		String packageB = TestCaseChecker.getPackageName(methodB);
+		MethodGenerator mg = new MethodGenerator();
+		String packageA = mg.getPackageName(methodA);
+		String packageB = mg.getPackageName(methodB);
 		if (!packageA.equals(packageB)) {
 			ImportDeclaration id = astA.newImportDeclaration();
 			id.setName(astA.newName(methodB.getClassName()));
-			if(!containsIDNode(idA, id)){
+			if (!containsIDNode(idA, id)) {
 				lrw.insertLast(id, null);
 			}
 		}
@@ -190,9 +190,9 @@ public class Transformation {
 
 	public boolean containsIDNode(List<ImportDeclaration> idList, ImportDeclaration targetId) {
 		boolean contain = false;
-		for(ImportDeclaration id : idList){
-			if(id.getName().toString().equals(targetId.getName().toString())){
-				contain=true;
+		for (ImportDeclaration id : idList) {
+			if (id.getName().toString().equals(targetId.getName().toString())) {
+				contain = true;
 				break;
 			}
 		}
