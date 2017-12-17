@@ -26,6 +26,8 @@ import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
+import com.google.common.collect.Lists;
+
 import search.MethodInfo;
 import search.SQLite;
 import search.Search;
@@ -33,7 +35,6 @@ import transformation.Controller;
 import transformation.Transformation;
 
 public class MethodGenerator {
-
 
 	public static void main(String[] args) throws Exception {
 		MethodGenerator mg = new MethodGenerator();
@@ -43,16 +44,18 @@ public class MethodGenerator {
 	public void execute(String[] args) throws Exception {
 		Properties properties = new Properties();
 		Logger logger = null;
-		String suffixOfTestClass=null;
-		loadProperty(properties,"experiment.properties");
+		loadProperty(properties, "experiment.properties");
 		initialize(properties);
-		setLogger(logger,"ExperimentLog");
+		logger = setLogger(logger, "ExperimentLog");
+
+		int numberOfCompile;
 
 		/* 進化させるメソッドを取得 */
-		final int startId = Integer.parseInt(properties.getProperty("startId"));
+		//final int startId = Integer.parseInt(properties.getProperty("startId"));
 		Search search = new Search();
 		List<MethodInfo> methods = search.execute(args);// idの昇順で並んでいる
-		splitList(methods, startId);
+		//splitList(methods, startId);
+		splitList_kai(methods);
 		for (MethodInfo targetMethod : methods) {
 			if (!isCoverage100(targetMethod) || !isBranchCoverage100(targetMethod))
 				continue;
@@ -67,12 +70,14 @@ public class MethodGenerator {
 			String[] targetArgs = { "-r", targetMethod.getReturnType(), "-p", targetMethod.getParameterType(), "-m",
 					targetMethod.getMethodName(), "-P", properties.getProperty("targetProject") };
 			List<MethodInfo> evolvedMethods = search.execute(targetArgs);
-			logger.info("進化対象のメソッド数：" + evolvedMethods.size());
+			logger.info("進化対象のメソッド数：" + countCandidate(evolvedMethods));
 
 			/* メソッドの書き換え，コンパイル */
+			numberOfCompile = 0;
 			Transformation trans = new Transformation();
 			Controller ctr = new Controller();
 			for (MethodInfo evMethod : evolvedMethods) {
+				numberOfCompile++;
 				if (targetMethod.equals(evMethod) || evMethod.getStatementNumber() <= 1
 						|| !isSameClass(targetMethod, evMethod))
 					continue;
@@ -109,7 +114,7 @@ public class MethodGenerator {
 								false);
 					}
 					Thread th = new Thread(new TestCaseRunnerThread(targetClassName,
-							toPackageName(targetAbsClassName), testcase,properties,suffixOfTestClass));
+							toPackageName(targetAbsClassName), testcase, properties));
 					th.start();
 					th.join(60000);
 					if (th.isAlive()) {
@@ -119,7 +124,8 @@ public class MethodGenerator {
 						logger.info("テストケース成功．GenProg起動");
 						String[] arguments = { "-location", properties.getProperty("location"), "-mode", "jgenprog",
 								"-scope", properties.getProperty("scope"), "-failing",
-								targetAbsClassName + suffixOfTestClass,
+								targetAbsClassName + suffixOfTestCase(targetClassName,
+										toPackageName(targetAbsClassName), properties),
 								"-srcjavafolder",
 								"/src/main/java/", "-srctestfolder", "/src/test/", "-binjavafolder", "/target/classes",
 								"-bintestfolder", "/target/test-classes", "-flthreshold", "0.5", "-seed",
@@ -133,6 +139,7 @@ public class MethodGenerator {
 				}
 				if (isSuccess(targetMethod, properties)) {
 					logger.info("メソッドid " + targetMethod.getId() + "の自動生成が成功");
+					logger.info(numberOfCompile + "回目で成功");
 					break;
 				}
 			}
@@ -216,6 +223,14 @@ public class MethodGenerator {
 		return exists;
 	}
 
+	public String suffixOfTestCase(String className, String packageName, Properties properties) {
+		String suffix = "Test";
+		if (!existsTestFile(className, toDirectoryName(packageName + "." + className), properties)) {
+			suffix = "TestCase";
+		}
+		return suffix;
+	}
+
 	/**
 	 * テストケースが失敗したかどうか
 	 *
@@ -226,7 +241,7 @@ public class MethodGenerator {
 	 * @throws InterruptedException
 	 * @throws ClassNotFoundException
 	 */
-	public boolean testFailed(String className, String packageName,Properties properties, String suffixOfTestClass)
+	public boolean testFailed(String className, String packageName, Properties properties)
 			throws IOException, InterruptedException, ClassNotFoundException {
 		boolean failed = false;
 		String[] dependencies = properties.getProperty("dependencies").split(";", -1);
@@ -242,14 +257,7 @@ public class MethodGenerator {
 		}
 		URLClassLoader load;
 		load = URLClassLoader.newInstance(classFilesURL);
-		Class cl;
-		if (existsTestFile(className, toDirectoryName(packageName + "." + className),properties)) {
-			suffixOfTestClass = "Test";
-			cl = load.loadClass(packageName + "." + className + suffixOfTestClass);
-		} else {
-			suffixOfTestClass = "TestCase";
-			cl = load.loadClass(packageName + "." + className + suffixOfTestClass);//commons-ioの仕様
-		}
+		Class cl = load.loadClass(packageName + "." + className + suffixOfTestCase(className, packageName, properties));
 		JUnitCore junit = new JUnitCore();
 		Result result = junit.runClasses(cl);
 		// Result result = junit.run(Computer.serial(), cl);
@@ -364,7 +372,7 @@ public class MethodGenerator {
 	 * @throws SecurityException
 	 * @throws IOException
 	 */
-	public Logger setLogger(Logger logger,String logFileName) throws SecurityException, IOException {
+	public Logger setLogger(Logger logger, String logFileName) throws SecurityException, IOException {
 		logger = Logger.getLogger(logFileName);
 		FileHandler fh = new FileHandler(logFileName + ".log", true);
 		fh.setFormatter(new java.util.logging.SimpleFormatter());
@@ -451,6 +459,27 @@ public class MethodGenerator {
 			deleteFile(original.getAbsolutePath());
 			taihi.renameTo(original);
 		}
+	}
 
+	public int countCandidate(List<MethodInfo> evMethods) {
+		int count = 0;
+		for (MethodInfo method : evMethods) {
+			if (method.getStatementNumber() >= 1)
+				count++;
+		}
+		count--;//自分自身の数を引く
+		return count;
+	}
+
+	public void splitList_kai(List<MethodInfo> methods) {
+		List<Integer> list = Lists.newArrayList(3236);
+		//int[] list = {1, 226, 227, 389, 390, 397, 400, 427 };
+
+		Iterator<MethodInfo> it = methods.iterator();
+		while (it.hasNext()) {
+			MethodInfo method = it.next();
+			if (!list.contains(method.getId()))
+				it.remove();
+		}
 	}
 }

@@ -86,7 +86,7 @@ public class Controller {
 	 */
 	public int compile(String jarFileName, String javaFileName) {
 		File src = new File("work\\" + javaFileName);
-		String[] args = { "-classpath", jarFileName, src.getAbsolutePath() };
+		String[] args = { "-classpath", jarFileName, src.getAbsolutePath(),"-XDuseUnsharedTable" };
 		JavaCompiler c = ToolProvider.getSystemJavaCompiler();
 		int r = c.run(null, null, null, args);
 		return r;
