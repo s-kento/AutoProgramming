@@ -33,6 +33,18 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.codec.DecoderException;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.CheckoutConflictException;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.api.errors.InvalidRefNameException;
+import org.eclipse.jgit.api.errors.RefAlreadyExistsException;
+import org.eclipse.jgit.api.errors.RefNotFoundException;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevWalk;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
@@ -47,11 +59,12 @@ import search.SQLite;
 import search.Search;
 import transformation.Transformation;
 
-public class Test{
+public class Test {
 	public static void main(String[] args) throws URISyntaxException, ClassNotFoundException, IOException, SQLException,
-			ParseException, DecoderException, InterruptedException, ParserConfigurationException, SAXException {
-		//test10(args);
-		test13();
+			ParseException, DecoderException, InterruptedException, ParserConfigurationException, SAXException,
+			RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException,
+			GitAPIException {
+		test14();
 	}
 
 	/*
@@ -275,37 +288,50 @@ public class Test{
 
 	public static void test11() throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		//factory.setValidating(false);
+		// factory.setValidating(false);
 		DocumentBuilder documentBuilder = factory.newDocumentBuilder();
 		Document document = documentBuilder.parse(new File("commons-math.xml"));
 
 		Element root = document.getDocumentElement();
-		System.out.println("Node Name: "+root.getNodeName());
+		System.out.println("Node Name: " + root.getNodeName());
 	}
 
-	public static void test12() throws ClassNotFoundException, SQLException{
+	public static void test12() throws ClassNotFoundException, SQLException {
 		SQLite sqLite = new SQLite(null, "coverages");
 		double coverage;
-		int num=0;
-		for(int i=1;i<5742;i++){
-			coverage=sqLite.getCoverage(String.valueOf(i));
-			if(coverage==(double)1)
+		int num = 0;
+		for (int i = 1; i < 5742; i++) {
+			coverage = sqLite.getCoverage(String.valueOf(i));
+			if (coverage == (double) 1)
 				num++;
 		}
 		System.out.println(num);
 	}
 
-	public static void test13() throws ClassNotFoundException, SQLException{
+	public static void test13() throws ClassNotFoundException, SQLException {
 		SQLite sqLite = new SQLite(null, "coverages");
 		double coverage;
 		double branchCoverage;
-		int num=0;
-		for(int i=1;i<5664;i++){
-			coverage=sqLite.getCoverage(String.valueOf(i));
-			branchCoverage=sqLite.getBranchCoverage(String.valueOf(i));
-			if(coverage==(double)1&&branchCoverage==(double)1)
+		int num = 0;
+		for (int i = 1; i < 5664; i++) {
+			coverage = sqLite.getCoverage(String.valueOf(i));
+			branchCoverage = sqLite.getBranchCoverage(String.valueOf(i));
+			if (coverage == (double) 1 && branchCoverage == (double) 1)
 				num++;
 		}
 		System.out.println(num);
+	}
+
+	public static void test14() throws IOException, RefAlreadyExistsException, RefNotFoundException,
+			InvalidRefNameException, CheckoutConflictException, GitAPIException {
+		FileRepositoryBuilder builder = new FileRepositoryBuilder();
+		Repository repository = builder.setGitDir(new File("D:\\new_workspace\\commons-text\\.git")).build();
+		Git git = new Git(repository);
+		RevWalk revWalk = new RevWalk(repository);
+		ObjectId headId = repository.resolve(Constants.HEAD);
+		RevCommit headCommit = revWalk.parseCommit(headId);
+		RevCommit[] parents = headCommit.getParents();// parentが複数なるときってどんなとき？
+		git.checkout().setName(parents[0].toObjectId().getName()).call();
+		System.out.println(parents[0].toObjectId().getName());
 	}
 }
