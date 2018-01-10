@@ -9,6 +9,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+
 import search.MethodInfo;
 import search.Search;
 import transformation.Controller;
@@ -21,7 +22,6 @@ public class MethodGeneratorWithNopol {
 	public static void main(String[] args) throws Exception {
 		Properties properties = new Properties();
 		Logger logger=null;
-		String suffixOfTestClass="Test";
 		MethodGenerator mg = new MethodGenerator();
 		mg.loadProperty(properties,"experiment_nopol.properties");
 		mg.initialize(properties);
@@ -83,7 +83,7 @@ public class MethodGeneratorWithNopol {
 								false);
 					}
 					Thread th = new Thread(
-							new TestCaseRunnerThread(targetClassName, mg.toPackageName(targetAbsClassName), testcase,properties,suffixOfTestClass));
+							new TestCaseRunnerThread(targetClassName, mg.toPackageName(targetAbsClassName), testcase,properties));
 					th.start();
 					th.join(60000);
 					if (th.isAlive()) {
@@ -92,7 +92,8 @@ public class MethodGeneratorWithNopol {
 					if (testcase.existsTestCase()) {
 						logger.info("テストケース成功．Nopol起動");
 						String[] arguments = { "-s", "work/commons-text/src/main/java", "-c", properties.getProperty("classpath"),"-t",
-								targetAbsClassName + suffixOfTestClass, "-p", "z3.exe" };
+								targetAbsClassName + mg.suffixOfTestCase(targetClassName,
+										mg.toPackageName(targetAbsClassName), properties), "-p", "z3.exe" };
 						Thread nopol = new Thread(new Nopol(arguments));
 						nopol.run();
 						logger.info("Nopol終了");
