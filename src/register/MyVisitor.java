@@ -42,6 +42,9 @@ public class MyVisitor extends ASTVisitor {
 
 	private SQLite db;
 
+	public MyVisitor() {
+	}
+
 	public MyVisitor(CompilationUnit unit, String filePath, String db, String table, String projectName)
 			throws ClassNotFoundException, SQLException {// コンストラクタ
 		this.unit = unit;
