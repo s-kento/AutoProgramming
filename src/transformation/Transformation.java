@@ -134,6 +134,22 @@ public class Transformation {
 	}
 
 	/**
+	 * クラスAにmethodBを挿入。methodBの名前はmethodAに置き換える
+	 * @param methodA target method
+	 * @param methodB based method
+	 * @return
+	 * @throws IOException
+	 */
+	public String replaceCode4(MethodInfo methodA, MethodInfo methodB) throws IOException {
+		String replacedSourceCode =null;
+		SourceFileAnalyzer sfa = new SourceFileAnalyzer();
+		CompilationUnit unitA = sfa.getAST(methodA.getFilePath());
+		CompilationUnit unitB = sfa.getAST(methodB.getFilePath());
+
+		return replacedSourceCode;
+	}
+
+	/**
 	 * ASTからソースコードを復元
 	 *
 	 * @param ソースコード，AST

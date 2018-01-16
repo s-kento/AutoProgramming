@@ -20,7 +20,7 @@ public class MethodInfo {
 	private int statementNumber;
 
 
-	MethodInfo(int id, String filePath, String className, String methodName, String returnType, String parameterType,
+	public MethodInfo(int id, String filePath, String className, String methodName, String returnType, String parameterType,
 			String projectName, int startLine, int endLine, int statementNumber, String sourceCode) throws DecoderException {
 		setId(id);
 		setFilePath(filePath);
