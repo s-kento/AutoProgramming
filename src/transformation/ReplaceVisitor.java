@@ -61,8 +61,7 @@ public class ReplaceVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (node.getName().toString().equals(method.getMethodName())
-				&& getParameterString(node.parameters()).equals(method.getParameterType())) {
+		if (method.getStartLine()==unit.getLineNumber(node.getStartPosition()-1)) {
 			setMethodNode(node);
 
 			if (replace) {
