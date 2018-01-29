@@ -1,10 +1,15 @@
 package experiment;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
@@ -18,14 +23,13 @@ import transformation.Transformation;
 
 public class MethodGeneratorWithNopol {
 
-
 	public static void main(String[] args) throws Exception {
 		Properties properties = new Properties();
-		Logger logger=null;
+		Logger logger = null;
 		MethodGenerator mg = new MethodGenerator();
-		mg.loadProperty(properties,"experiment_nopol.properties");
+		mg.loadProperty(properties, "experiment_nopol.properties");
 		mg.initialize(properties);
-		logger=mg.setLogger(logger,"ExperimentLog_nopol");
+		logger = mg.setLogger(logger, "ExperimentLog_nopol");
 
 		final int startId = Integer.parseInt(properties.getProperty("startId"));
 		Search search = new Search();
@@ -59,9 +63,10 @@ public class MethodGeneratorWithNopol {
 				System.out.println("evoleved: " + evMethod.getClassName() + ", " + evMethod.getMethodName());
 				String replacedCode = trans.replaceCode(targetMethod, evMethod);
 				File targetJavaFile = new File(properties.getProperty("workingDir") + targetJavaFileName);
-				FileWriter filewriter = new FileWriter(targetJavaFile);
-				filewriter.write(replacedCode);
-				filewriter.close();
+				//FileWriter filewriter = new FileWriter(targetJavaFile);
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetJavaFile),"UTF-8"));
+				bw.write(replacedCode);
+				bw.close();
 				int r;
 				System.out.println(r = ctr.compile(projectJarFileName + ";" + dependencies, targetJavaFileName));
 				if (r != 0)
@@ -82,8 +87,8 @@ public class MethodGeneratorWithNopol {
 								new File(properties.getProperty("workingDir") + targetClassFileName), dstclassDir,
 								false);
 					}
-					Thread th = new Thread(
-							new TestCaseRunnerThread(targetClassName, mg.toPackageName(targetAbsClassName), testcase,properties));
+					Thread th = new Thread(new TestCaseRunnerThread(targetClassName,
+							mg.toPackageName(targetAbsClassName), testcase, properties));
 					th.start();
 					th.join(60000);
 					if (th.isAlive()) {
@@ -91,11 +96,38 @@ public class MethodGeneratorWithNopol {
 					}
 					if (testcase.existsTestCase()) {
 						logger.info("テストケース成功．Nopol起動");
-						String[] arguments = { "-s", "work/commons-text/src/main/java", "-c", properties.getProperty("classpath"),"-t",
-								targetAbsClassName + mg.suffixOfTestCase(targetClassName,
-										mg.toPackageName(targetAbsClassName), properties), "-p", "z3.exe" };
-						Thread nopol = new Thread(new Nopol(arguments));
-						nopol.run();
+						/*
+						 * String[] arguments = { "-s",
+						 * "work/commons-text/src/main/java", "-c",
+						 * properties.getProperty("classpath"),"-t",
+						 * targetAbsClassName +
+						 * mg.suffixOfTestCase(targetClassName,
+						 * mg.toPackageName(targetAbsClassName),
+						 * properties),"--maxTime","30", "-p", "z3.exe" };
+						 * Thread nopol = new Thread(new Nopol(arguments));
+						 * nopol.start(); nopol.join(1800000);
+						 */
+						String[] arguments = { "java", "-jar",
+								"C:\\Users\\s-kento\\git\\nopol\\nopol\\target\\nopol-0.2-SNAPSHOT-jar-with-dependencies.jar",
+								"-s", "work/commons-text/src/main/java", "-c", properties.getProperty("classpath"),
+								"-t",
+								mg.removeDollar(targetAbsClassName) + mg.suffixOfTestCase(targetClassName,
+										mg.toPackageName(targetAbsClassName), properties),
+								"--maxTime", "20", "-p", "z3.exe" };
+						ProcessBuilder pb = new ProcessBuilder(arguments);
+						pb.redirectErrorStream(true);
+						//pb.directory(new File("work\\commons-math"));
+						Process process = pb.start();
+						InputStream is = process.getInputStream();
+						test.Test.printInputStream(is);
+
+						/*boolean end = process.waitFor(1200, TimeUnit.SECONDS); //10秒でタイムアウト
+						if (end) {
+							System.out.println("正常終了 " + process.exitValue());
+						} else {
+							System.out.println("タイムアウト");
+							process.destroy(); // プロセスを強制終了
+						}*/
 						logger.info("Nopol終了");
 					}
 					mg.untaihi(dstsrcDir, dstclassDir, targetJavaFileName, targetClassFileNames);
@@ -111,8 +143,8 @@ public class MethodGeneratorWithNopol {
 	public static boolean isSuccess(MethodInfo targetMethod) {
 		boolean exists = false;
 		File file = new File("patch_1.diff");
-		if (file.exists()){
-			File newFile = new File("patch_"+targetMethod.getId()+".diff");
+		if (file.exists()) {
+			File newFile = new File("patch_" + targetMethod.getId() + ".diff");
 			file.renameTo(newFile);
 			exists = true;
 		}
