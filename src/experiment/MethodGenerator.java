@@ -1,12 +1,15 @@
 package experiment;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.sql.SQLException;
@@ -90,9 +93,9 @@ public class MethodGenerator {
 				System.out.println("evoleved: " + evMethod.getClassName() + ", " + evMethod.getMethodName());
 				String replacedCode = trans.replaceCode(targetMethod, evMethod);
 				File targetJavaFile = new File(properties.getProperty("workingDir") + targetJavaFileName);
-				FileWriter filewriter = new FileWriter(targetJavaFile);
-				filewriter.write(replacedCode);
-				filewriter.close();
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetJavaFile),"UTF-8"));
+				bw.write(replacedCode);
+				bw.close();
 				int r;
 				System.out.println(r = ctr.compile(projectJarFileName + ";" + dependencies, targetJavaFileName));
 				if (r != 0)
@@ -481,5 +484,17 @@ public class MethodGenerator {
 			if (!list.contains(method.getId()))
 				it.remove();
 		}
+	}
+
+	/**
+	 * targetAbsClassから$以降を取り除く(内部クラスの場合に有効)
+	 * a.b.c.hoge$fuga-->a.b.c.hoge
+	 * @param targetAbsClass
+	 * @return str
+	 */
+	public String removeDollar(String targetAbsClass){
+		String str;
+		str = targetAbsClass.split("$")[0];
+		return str;
 	}
 }
